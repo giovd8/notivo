@@ -1,0 +1,38 @@
+<nav id="sidenav" aria-label="Navigazione principale" class="h-full">
+    <div class="flex flex-col items-center gap-8 select-none h-full rounded-lg">
+        <!-- Logo Section -->
+        <a routerLink="/" class="flex gap-2 items-center">
+            <img src="logo/logo.webp" alt="Notivo" class="w-20" />
+            <span class="text-2xl font-bold">Notivo</span>
+        </a>
+
+        <!-- Menu Section -->
+        <div class="flex flex-col justify-between flex-1">
+            <ul class="w-full space-y-4">
+                @for (item of sidenavItems(); track $index) {
+                @if (item.spacing) {
+                <hr class="bg-tertiary my-4 rounded-full" />
+                }
+                <li>
+                    <a [routerLink]="item.route" routerLinkActive="active" #rla="routerLinkActive" [attr.aria-current]="rla.isActive ? 'page' : null"
+                        class="focus:outline-2 focus:outline-white/80 focus:outline-offset-2 px-4 rounded-2xl flex items-center gap-3  ">
+                        <i [ngClass]="item.icon" class="text-lg flex-shrink-0" aria-hidden="true"></i>
+                        <span class="text-sm whitespace-nowrap overflow-hidden">
+                            {{ item.title }}
+                        </span>
+                    </a>
+                </li>
+                }
+            </ul>
+            <!-- Footer Section -->
+            <div class="flex flex-col items-center gap-1 py-2 w-full overflow-hidden">
+                <hr />
+                <div class="flex flex-col items-center">
+                    <!-- <img src="logo/logo.webp" alt="logo" class="h-10" /> -->
+                    <span class="text-white text-sm font-bold">Notivo</span>
+                    <span class=" text-xs font-thin">v{{ version() }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
