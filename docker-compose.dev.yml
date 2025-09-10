@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  fe:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile.dev
+    command: npm run start -- --host 0.0.0.0 --port 4200 --poll 2000
+    environment:
+      CHOKIDAR_USEPOLLING: "1"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./fe:/app
+      - /app/node_modules
+    expose:
+      - "4200"
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      - fe
+      - gateway
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
