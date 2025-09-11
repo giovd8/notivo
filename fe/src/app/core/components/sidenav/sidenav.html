@@ -2,7 +2,7 @@
     <div class="flex flex-col items-center gap-8 select-none h-full rounded-lg">
         <!-- Logo Section -->
         <a routerLink="/" class="flex gap-2 items-center">
-            <img src="logo.webp" alt="Notivo" class="w-20" />
+            <img src="logo.webp" alt="Logo Notivo" class="w-20" />
             <span class="text-2xl font-bold">Notivo</span>
         </a>
 
@@ -10,10 +10,11 @@
         <div class="flex flex-col justify-between flex-1">
             <ul class="w-full space-y-4">
                 @for (item of sidenavItems(); track $index) {
-                @if (item.spacing) {
-                <hr class="bg-tertiary my-4 rounded-full" />
-                }
+
                 <li>
+                    @if (item.spacing) {
+                    <hr class="bg-tertiary my-4 rounded-full" />
+                    }
                     <a [routerLink]="item.route" routerLinkActive="active" #rla="routerLinkActive" [attr.aria-current]="rla.isActive ? 'page' : null"
                         class="focus:outline-2 focus:outline-white/80 focus:outline-offset-2 px-4 rounded-2xl flex items-center gap-3  ">
                         <i [ngClass]="item.icon" class="text-lg flex-shrink-0" aria-hidden="true"></i>
