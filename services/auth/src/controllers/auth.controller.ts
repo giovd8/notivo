@@ -1,13 +1,20 @@
 import { Request, Response } from 'express';
-import { registerUser } from "../services/auth.service";
+import { loginUser, refreshTokens, registerUser } from "../services/auth.service";
 
 const login = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+    const tokens = await loginUser(username, password);
+    return res.json(tokens);
+  } catch (err: any) {
+    if (err?.message === "INVALID_CREDENTIALS") {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-//   const user = await User.create({ username, password });
-  res.json({ message: "Register successful" });
 };
 
 const register = async (req: Request, res: Response) => {
@@ -26,4 +33,18 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-export default { login, register };
+const refresh = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) return res.status(400).json({ message: "Refresh token is required" });
+    const tokens = await refreshTokens(refreshToken);
+    return res.json(tokens);
+  } catch (err: any) {
+    if (err?.message === "INVALID_REFRESH") {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export default { login, register, refresh };
