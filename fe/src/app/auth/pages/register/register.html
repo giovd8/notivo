@@ -1,0 +1,160 @@
+<main class="h-full grid place-items-center">
+  <div class="notivo-card w-full max-w-md !backdrop-blur-lg !bg-white/50">
+    <notivo-header
+      title="Crea il tuo account"
+      description="Registrati per iniziare ad usare Notivo"
+    />
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="space-y-4"
+      aria-labelledby="register-title"
+      novalidate
+    >
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        <input
+          id="username"
+          type="text"
+          class="notivo-input w-full"
+          placeholder="Inserisci username"
+          formControlName="username"
+          autocomplete="username"
+          required
+          [attr.aria-invalid]="
+            form.controls.username.touched && form.controls.username.invalid ? 'true' : null
+          "
+          [attr.aria-describedby]="
+            form.controls.username.touched && form.controls.username.invalid
+              ? 'username-error'
+              : null
+          "
+        />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+        <p id="username-error" class="text-xs text-red-600 mt-1" role="alert">
+          Minimo 5 caratteri.
+        </p>
+        }
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <div class="relative">
+          <input
+            id="password"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            class="notivo-input w-full pr-10"
+            placeholder="Inserisci password"
+            formControlName="password"
+            autocomplete="new-password"
+            required
+            [attr.aria-invalid]="
+              form.controls.password.touched && form.controls.password.invalid ? 'true' : null
+            "
+            [attr.aria-describedby]="
+              form.controls.password.touched && form.controls.password.invalid
+                ? 'password-error'
+                : null
+            "
+          />
+          <button
+            type="button"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="passwordVisible() ? 'Nascondi password' : 'Mostra password'"
+            aria-controls="password"
+            [attr.aria-pressed]="passwordVisible()"
+          >
+            @if (!passwordVisible()) {
+            <i class="bi bi-eye" aria-hidden="true"></i>
+            } @else {
+            <i class="bi bi-eye-slash" aria-hidden="true"></i>
+            }
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+        <p id="password-error" class="text-xs text-red-600 mt-1" role="alert">
+          Minimo 5 caratteri.
+        </p>
+        }
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1"
+          >Conferma password</label
+        >
+        <div class="relative">
+          <input
+            id="confirmPassword"
+            [type]="confirmPasswordVisible() ? 'text' : 'password'"
+            class="notivo-input w-full pr-10"
+            placeholder="Inserisci conferma password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            required
+            [attr.aria-invalid]="
+              (form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid) ||
+              (form.hasError('passwordsMismatch') &&
+                (form.controls.confirmPassword.touched || form.controls.password.touched))
+                ? 'true'
+                : null
+            "
+            [attr.aria-describedby]="
+              (form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid
+                ? 'confirmPassword-error'
+                : '') +
+                (form.hasError('passwordsMismatch') &&
+                (form.controls.confirmPassword.touched || form.controls.password.touched)
+                  ? ' passwords-mismatch-error'
+                  : '') || null
+            "
+          />
+          <button
+            type="button"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700"
+            (click)="toggleConfirmPasswordVisibility()"
+            [attr.aria-label]="
+              confirmPasswordVisible() ? 'Nascondi conferma password' : 'Mostra conferma password'
+            "
+            aria-controls="confirmPassword"
+            [attr.aria-pressed]="confirmPasswordVisible()"
+          >
+            @if (!confirmPasswordVisible()) {
+            <i class="bi bi-eye" aria-hidden="true"></i>
+            } @else {
+            <i class="bi bi-eye-slash" aria-hidden="true"></i>
+            }
+          </button>
+        </div>
+        @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid) {
+        <p id="confirmPassword-error" class="text-xs text-red-600 mt-1" role="alert">
+          Minimo 5 caratteri.
+        </p>
+        } @else if (form.hasError('passwordsMismatch') && (form.controls.confirmPassword.touched ||
+        form.controls.password.touched)) {
+        <p id="passwords-mismatch-error" class="text-xs text-red-600 mt-1" role="alert">
+          Le password non coincidono.
+        </p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="notivo-btn-primary w-full justify-center h-10"
+        aria-label="Registrati"
+        title="Registrati"
+        [disabled]="submitting() || form.invalid"
+        [attr.aria-disabled]="submitting()"
+        [attr.aria-busy]="submitting()"
+      >
+        @if (!submitting()) { Registrati } @else { Registrazione... }
+      </button>
+    </form>
+
+    <p class="text-xs text-gray-500 mt-6 text-center">
+      Hai già un account?
+      <a routerLink="/login" class="text-primary hover:underline font-bold text-sm">Accedi</a>
+    </p>
+  </div>
+</main>

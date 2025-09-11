@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Api } from '../../services/api';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'notivo-home',
@@ -9,5 +9,5 @@ import { Api } from '../../services/api';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
-  readonly api = inject(Api);
+  readonly api = inject(ApiService);
 }
