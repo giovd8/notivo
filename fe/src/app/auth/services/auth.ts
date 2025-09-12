@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
-import { UserCreateDTO } from '../../shared/models/user';
+import { NotivoResponse } from '../../core/models';
+import { User, UserCredential } from '../../shared/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -9,11 +11,23 @@ import { UserCreateDTO } from '../../shared/models/user';
 export class AuthService {
   private readonly http = inject(HttpClient);
 
-  login(data: UserCreateDTO) {
-    return this.http.post('/api/auth/login', data).pipe(share());
+  login(data: UserCredential): Observable<NotivoResponse<User>> {
+    return this.http.post<NotivoResponse<User>>('/api/auth/login', data).pipe(share());
   }
 
-  register(data: UserCreateDTO) {
-    return this.http.post('/api/auth/register', data).pipe(share());
+  register(data: UserCredential): Observable<NotivoResponse<User>> {
+    return this.http.post<NotivoResponse<User>>('/api/auth/register', data).pipe(share());
+  }
+
+  refresh(): Observable<NotivoResponse<User>> {
+    return this.http
+      .post<NotivoResponse<User>>('/api/auth/refresh', {}, { withCredentials: true })
+      .pipe(share());
+  }
+
+  logout(): Observable<NotivoResponse<void>> {
+    return this.http
+      .post<NotivoResponse<void>>('/api/auth/logout', {}, { withCredentials: true })
+      .pipe(share());
   }
 }

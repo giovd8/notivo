@@ -8,7 +8,7 @@ export class ApiService {
   private readonly http = inject(HttpClient);
 
   test() {
-    return this.http.get(`/api/auth`).subscribe(
+    return this.http.get(`/api/healthz`).subscribe(
       (res) => {
         console.log(res);
       },

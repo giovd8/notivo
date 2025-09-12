@@ -1,7 +1,8 @@
-export interface User {
+
+export interface UserEntity {
   id: string;
   username: string;
-  password: string;
+  passwordHash: string;
   createdAt: Date;
 }
 
@@ -11,7 +12,7 @@ export interface UserDTO {
   createdAt: Date;
 }
 
-export interface UserCreateDTO {
+export interface UserCredentialDTO {
   username: string;
   password: string;
 }

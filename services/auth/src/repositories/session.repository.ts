@@ -11,11 +11,6 @@ export const createSession = async (doc: SessionDocument): Promise<void> => {
   await col.insertOne(doc as any);
 };
 
-export const deleteUserSessions = async (userId: string): Promise<void> => {
-  const col = getCollection();
-  await col.deleteMany({ userId });
-};
-
 export const findSessionByRefreshToken = async (refreshToken: string): Promise<SessionDocument | null> => {
   const col = getCollection();
   return await col.findOne({ refreshToken });
@@ -30,6 +25,11 @@ export const replaceSessionTokens = async (
     { refreshToken },
     { $set: { token: next.token, refreshToken: next.refreshToken, expiresAt: next.expiresAt } }
   );
+};
+
+export const deleteSessionByRefreshToken = async (refreshToken: string): Promise<void> => {
+  const col = getCollection();
+  await col.deleteOne({ refreshToken });
 };
 
 

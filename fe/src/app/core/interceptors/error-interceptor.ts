@@ -1,10 +1,10 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { ToastType } from '../models';
+import { AuthStore } from '../../auth/auth.store';
 import { ToastService } from '../services/toast';
 
-const DEFAULT_ERROR_MESSAGE = 'Si è verificato un errore imprevisto.';
+const DEFAULT_ERROR_MESSAGE = 'Si è verificato un errore imprevisto. Riprova più tardi.';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
@@ -12,6 +12,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((err: unknown) => {
       let message = DEFAULT_ERROR_MESSAGE;
+
+      // if error is 401, logout
+      if (err instanceof HttpErrorResponse && err.status === 401) {
+        inject(AuthStore).logout().subscribe();
+      }
 
       if (err instanceof HttpErrorResponse) {
         const maybeMessage = (err.error && (err.error as { message?: unknown }).message) as
@@ -22,7 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      toast.show({ message, type: ToastType.Error, seconds: 6 });
+      // toast.show({ message, type: ToastType.Error, seconds: 6 });
 
       return throwError(() => err);
     })

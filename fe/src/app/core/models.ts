@@ -15,3 +15,8 @@ export interface ToastShowOptions {
   type: ToastType;
   seconds: number;
 }
+
+export interface NotivoResponse<T> {
+  data: T;
+  message: string;
+}

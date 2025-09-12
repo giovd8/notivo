@@ -11,7 +11,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { UserCreateDTO } from '../../../shared/models/user';
+import { UserCredential } from '../../../shared/models/user';
 import { AuthService } from '../../services/auth';
 import { Header } from '../../shared/components/header/header';
 
@@ -76,7 +76,7 @@ export class Register {
     this.isError.set(false);
     this.submitting.set(true);
     this.auth
-      .register(this.form.value as UserCreateDTO)
+      .register(this.form.value as UserCredential)
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
         next: () => {

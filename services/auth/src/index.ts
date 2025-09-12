@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import dotenv from 'dotenv';
 import express from "express";
 import http from "http";
@@ -10,6 +11,7 @@ dotenv.config();
 export const createApp = () => {
   const app = express();
   app.use(express.json());
+  app.use(cookieParser());
   app.use("/", authRoutes);
   return app;
 };
