@@ -4,3 +4,19 @@ export interface SidenavItem {
   route: string;
   spacing: boolean;
 }
+
+export enum ToastType {
+  Success = 'success',
+  Error = 'error',
+}
+
+export interface ToastShowOptions {
+  message: string;
+  type: ToastType;
+  seconds: number;
+}
+
+export interface NotivoResponse<T> {
+  data: T;
+  message: string;
+}

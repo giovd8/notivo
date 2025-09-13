@@ -1,12 +1,51 @@
-import express, { Request, Response } from "express";
+import cookieParser from "cookie-parser";
+import dotenv from 'dotenv';
+import express from "express";
+import http from "http";
+import { closeMongo, initMongo } from "./configs/mongo";
+import { getDbPool, initPostgres } from "./configs/postgres";
+import authRoutes from "./routes/auth.routes";
 
-const app = express();
-const port = process.env.PORT || 3000;
+dotenv.config();
 
-app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "Hello from auth service" });
-});
+export const createApp = () => {
+  const app = express();
+  app.use(express.json());
+  app.use(cookieParser());
+  app.use("/", authRoutes);
+  return app;
+};
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+const start = async () => {
+  await Promise.all([initPostgres(), initMongo()]);
+  const app = createApp();
+  const port = Number(process.env.PORT || 3000);
+  const server = http.createServer(app);
+
+  const shutdown = async (signal: string) => {
+    console.log(`Received ${signal}. Shutting down...`);
+    server.close(async () => {
+      try {
+        const pool = getDbPool();
+        await pool.end();
+        await closeMongo();
+      } catch (e) {
+        // noop
+      } finally {
+        process.exit(0);
+      }
+    });
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+  server.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+};
+
+start().catch((err) => {
+  console.error("Startup error", err);
+  process.exit(1);
 });

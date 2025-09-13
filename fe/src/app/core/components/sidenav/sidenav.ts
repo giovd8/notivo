@@ -1,26 +1,19 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
-import { Router } from '@angular/router';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { SidenavItem } from '../../models';
-import packageJson from '../../../../../package.json';
+import { NgClass, NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Scroll } from '@angular/router';
-import { NgClass } from '@angular/common';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, Scroll } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import packageJson from '../../../../../package.json';
+import { AuthStore } from '../../../auth/auth.store';
+import { Tooltip } from '../../../shared/components/tooltip/tooltip';
+import { SidenavItem } from '../../models';
 import { sidenavItems } from '../../utils';
 
 @Component({
   selector: 'notivo-sidenav',
   templateUrl: './sidenav.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, RouterLink, RouterLinkActive],
+  imports: [NgClass, RouterLink, RouterLinkActive, NgOptimizedImage, Tooltip],
   host: {
     class: 'w-60 h-full notivo-card !bg-primary text-white',
   },
@@ -28,10 +21,13 @@ import { sidenavItems } from '../../utils';
 export class Sidenav {
   // Services
   private readonly router = inject(Router);
-  // private readonly authService = inject(AuthService);
+  private readonly authStore = inject(AuthStore);
 
   currentRoute = '';
   sidenavItems = signal<SidenavItem[]>(sidenavItems);
+  user = computed(() => this.authStore.user());
+  username = computed(() => this.user()?.username ?? '');
+  initial = computed(() => (this.username() ? this.username().charAt(0).toUpperCase() : ''));
   version = signal<string>(packageJson.version);
 
   constructor() {
@@ -43,37 +39,16 @@ export class Sidenav {
         else this.currentRoute = event.routerEvent.url;
       }
     });
-
-    // Auth service subscription
-    // this.authService
-    //   .getUser()
-    //   .pipe(takeUntilDestroyed())
-    //   .subscribe((user) => {
-    //     this.showMenuItems.set(!!user);
-    //   });
   }
 
   async itemClickedHandler(item: SidenavItem): Promise<void> {
     await this.router.navigate([item.route]);
-    // if (item.clicked && !!item.subItems) {
-    //   item.clicked = false;
-    //   return;
-    // }
-    // this.sidenavItems.update((sidenavItems) => {
-    //   return sidenavItems.map((sidenavItem: SidenavItem) => {
-    //     return {
-    //       ...sidenavItem,
-    //       clicked: sidenavItem === item,
-    //     };
-    //   });
-    // });
-    // if (!item.subItems) {
-    //   this.breadcrumbService.resetData();
-    //   this.breadcrumbService.addBreadCrumb({
-    //     label: item.name,
-    //     url: item.route,
-    //   });
-    //   await this.router.navigate([item.route]);
-    // }
+  }
+
+  logout(): void {
+    this.authStore
+      .logout()
+      .pipe(finalize(() => this.router.navigate(['/login'])))
+      .subscribe();
   }
 }
