@@ -1,6 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { UserCredential } from '../../../shared/models/user';
@@ -9,12 +17,23 @@ import { Header } from '../../shared/components/header/header';
 
 @Component({
   selector: 'notivo-login',
-  imports: [ReactiveFormsModule, RouterLink, Header],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    Header,
+    MatFormFieldModule,
+    MatSelectModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './login.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
+  toppings = new FormControl('');
+  toppingList: string[] = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
+
   readonly router = inject(Router);
   readonly store = inject(AuthStore);
   readonly submitting = signal(false);

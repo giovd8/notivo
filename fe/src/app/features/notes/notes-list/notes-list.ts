@@ -1,4 +1,4 @@
-import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,11 +13,12 @@ import { AuthStore } from '../../../auth/auth.store';
 import { NotivoResponse, ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
 import { ApiService } from '../../../services/api';
+import { Tooltip } from '../../../shared/components/tooltip/tooltip';
 import { Note } from '../../../shared/models/note';
 
 @Component({
   selector: 'notivo-notes-list',
-  imports: [NgFor, NgIf, RouterLink, NgClass, DatePipe],
+  imports: [RouterLink, NgClass, DatePipe, Tooltip],
   templateUrl: './notes-list.html',
   styles: `
     .clamp-10 {

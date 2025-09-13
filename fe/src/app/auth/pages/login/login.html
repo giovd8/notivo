@@ -98,6 +98,15 @@
       </button>
     </form>
 
+    <mat-form-field>
+      <mat-label>Toppings</mat-label>
+      <mat-select [formControl]="toppings" multiple panelClass="notivo-input">
+        @for (topping of toppingList; track topping) {
+        <mat-option [value]="topping">{{ topping }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
     <p class="text-xs text-gray-500 mt-6 text-center">
       Non hai un account?
       <a routerLink="/register" class="text-primary hover:underline font-bold text-sm"

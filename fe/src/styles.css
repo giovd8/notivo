@@ -9,12 +9,21 @@
   --color-dark: #1a1a1a;
 }
 
+html,
 body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* body {
   font-family: 'Montserrat', sans-serif;
   font-optical-sizing: auto;
   font-weight: normal;
   font-style: normal;
-}
+} */
 
 .notivo-btn-primary {
   @apply bg-primary text-white px-4 py-1 rounded-2xl shadow-lg flex items-center gap-2 text-sm hover:bg-primary/90 transition-colors duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer;

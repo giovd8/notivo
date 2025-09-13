@@ -1,7 +1,5 @@
 ---
-context: true
-priority: high
-scope: project
+alwaysApply: true
 ---
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write maintainable, performant, and accessible code following Angular and TypeScript best practices.
@@ -51,3 +49,18 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Styling
+
+- Use Tailwind 4 utility classes in `class` bindings
+- Avoid writing inline CSS unless absolutely necessary
+- Organize Tailwind classes in a readable order (e.g., layout → spacing → typography → color → effects)
+- Prefer `@apply` in global styles only for reusable class combinations
+
+## Icons
+
+- Use boostrap icons
+
+## Images
+
+- Use ngSrc for image optimization

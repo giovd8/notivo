@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, finalize, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { AuthStore } from '../../auth/auth.store';
 import { ToastService } from '../services/toast';
 
@@ -18,10 +18,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       // if error is 401, logout
       if (err instanceof HttpErrorResponse && err.status === 401 && !req.url.includes('/login')) {
-        authStore
-          .logout()
-          .pipe(finalize(() => router.navigate(['/login'])))
-          .subscribe();
+        // authStore
+        //   .logout()
+        //   .pipe(finalize(() => router.navigate(['/login'])))
+        //   .subscribe();
       }
 
       if (err instanceof HttpErrorResponse) {

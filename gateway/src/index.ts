@@ -15,7 +15,8 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z.enum(["development", "production"]).default("development"),
   AUTH_SERVICE_URL: z.string().url().default("http://auth-service:3000"),
-  NOTE_SERVICE_URL: z.string().url().default("http://note-service:3000"),
+  USERS_SERVICE_URL: z.string().url().default("http://users-service:3000"),
+  NOTES_SERVICE_URL: z.string().url().default("http://notes-service:3000"),
   CORS_ORIGIN: z.string().optional(),
 });
 const env = EnvSchema.parse(process.env);
@@ -61,8 +62,13 @@ app.use("/auth", createProxyMiddleware({
   ...commonProxyOptions,
 }));
 
-app.use("/note", authMiddleware, createProxyMiddleware({
-  target: env.NOTE_SERVICE_URL,
+app.use("/notes", authMiddleware, createProxyMiddleware({
+  target: env.NOTES_SERVICE_URL,
+  ...commonProxyOptions,
+}));
+
+app.use("/users", authMiddleware, createProxyMiddleware({
+  target: env.USERS_SERVICE_URL,
   ...commonProxyOptions,
 }));
 
