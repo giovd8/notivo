@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { NotivoResponse } from '../core/models';
 import { Note, NotePayload } from '../shared/models/note';
 
@@ -23,9 +24,17 @@ export class ApiService {
     });
   }
 
-  createNote(payload: NotePayload) {
+  createNote(payload: NotePayload): Observable<NotivoResponse<Note>> {
     return this.http.post<NotivoResponse<Note>>(`/api/note/notes`, payload, {
       withCredentials: true,
     });
+  }
+
+  listNotes(): Observable<NotivoResponse<Note[]>> {
+    return this.http.get<NotivoResponse<Note[]>>(`/api/note/notes`, { withCredentials: true });
+  }
+
+  deleteNote(id: string): Observable<void> {
+    return this.http.delete<void>(`/api/note/notes/${id}`, { withCredentials: true });
   }
 }

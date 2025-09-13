@@ -7,15 +7,13 @@ export interface NoteEntity {
   updatedAt: Date;
 }
 
-export interface CreateNoteDTO {
+export interface CreateNoteEntity {
   title: string;
   body: string;
+  sharedWith: string[];
+  tags: string[];
 }
 
-export interface UpdateNoteDTO {
-  title?: string;
-  body?: string;
-}
 
 export type ListFilter = "all" | "shared";
 

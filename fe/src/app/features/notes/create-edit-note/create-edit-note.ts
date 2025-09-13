@@ -15,9 +15,9 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import Quill from 'quill';
-import { ToastType } from '../../core/models';
-import { ToastService } from '../../core/services/toast';
-import { ApiService } from '../../services/api';
+import { ToastType } from '../../../core/models';
+import { ToastService } from '../../../core/services/toast';
+import { ApiService } from '../../../services/api';
 
 @Component({
   selector: 'notivo-create-edit-note',

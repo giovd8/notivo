@@ -1,7 +1,7 @@
 import { getDbPool } from "../configs/postgres";
-import { CreateNoteDTO, ListFilter, NoteDTO, NoteEntity, UpdateNoteDTO } from "../models/note";
+import { CreateNoteEntity, NoteDTO, NoteEntity } from "../models/note";
 
-export const createNote = async (ownerId: string, input: CreateNoteDTO): Promise<NoteEntity> => {
+export const createNote = async (ownerId: string, input: CreateNoteEntity): Promise<NoteEntity> => {
   const pool = getDbPool();
   const result = await pool.query(
     `INSERT INTO notes (title, body, owner_id)
@@ -21,30 +21,19 @@ export const toNoteDTO = (note: NoteEntity): NoteDTO => ({
   updatedAt: note.updatedAt,
 });
 
-export const listNotes = async (userId: string, filter: ListFilter): Promise<NoteEntity[]> => {
+export const listNotes = async (userId: string,): Promise<NoteEntity[]> => {
   const pool = getDbPool();
-  if (filter === "shared") {
-    const result = await pool.query(
-      `SELECT n.id, n.title, n.body, n.owner_id as "ownerId", n.created_at as "createdAt", n.updated_at as "updatedAt"
-       FROM notes n
-       INNER JOIN notes_shared ns ON ns.note_id = n.id
-       WHERE ns.user_id = $1
-       ORDER BY n.created_at DESC`,
-      [userId]
-    );
-    return result.rows as NoteEntity[];
-  }
   const result = await pool.query(
     `SELECT id, title, body, owner_id as "ownerId", created_at as "createdAt", updated_at as "updatedAt"
      FROM notes
-     WHERE owner_id = $1
+     WHERE owner_id = $1 OR owner_id IN (SELECT user_id FROM notes_shared WHERE note_id = notes.id)
      ORDER BY created_at DESC`,
     [userId]
   );
   return result.rows as NoteEntity[];
 };
 
-export const updateNote = async (userId: string, noteId: string, input: UpdateNoteDTO): Promise<NoteEntity | null> => {
+export const updateNote = async (userId: string, noteId: string, input: CreateNoteEntity): Promise<NoteEntity | null> => {
   const pool = getDbPool();
   const fields: string[] = [];
   const values: unknown[] = [];

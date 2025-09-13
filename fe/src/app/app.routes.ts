@@ -10,29 +10,18 @@ export const routes: Routes = [
     path: 'notes/add',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/create-edit-note/create-edit-note').then((m) => m.CreateEditNote),
+      import('./features/notes/create-edit-note/create-edit-note').then((m) => m.CreateEditNote),
   },
   {
     path: 'notes/edit/:id',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/create-edit-note/create-edit-note').then((m) => m.CreateEditNote),
+      import('./features/notes/create-edit-note/create-edit-note').then((m) => m.CreateEditNote),
   },
   {
     path: 'notes',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/all-notes/all-notes').then((m) => m.AllNotes),
-  },
-  {
-    path: 'notes/my',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/my-notes/my-notes').then((m) => m.MyNotes),
-  },
-  {
-    path: 'notes/shared',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/shared-with-me/shared-with-me').then((m) => m.SharedWithMe),
+    loadComponent: () => import('./features/notes/notes-list/notes-list').then((m) => m.NotesList),
   },
   {
     path: '',

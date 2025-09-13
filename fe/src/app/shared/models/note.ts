@@ -3,8 +3,8 @@ export interface Note {
   title: string;
   body: string;
   ownerId: string;
-  sharedWith: string[];
-  tags: string[];
+  sharedWith?: string[];
+  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
