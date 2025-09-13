@@ -1,0 +1,68 @@
+<main class="max-w-2xl mx-auto p-4">
+  <section>
+    <h1 class="text-xl font-semibold mb-4">Crea nota</h1>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate aria-describedby="note-help">
+      <p id="note-help" class="text-sm text-gray-600 mb-4">
+        I campi contrassegnati sono obbligatori.
+      </p>
+
+      <div class="mb-4">
+        <label for="title" class="block text-sm font-medium mb-1">Titolo *</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          required
+          aria-required="true"
+          placeholder="Inserisci titolo"
+          [attr.aria-invalid]="
+            form.controls.title.invalid && form.controls.title.touched ? 'true' : 'false'
+          "
+          class="w-full notivo-input"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="body-editor" class="block text-sm font-medium mb-1">Contenuto *</label>
+        <div #quillEditor id="quill-container" class="w-full !h-[40vh]"></div>
+        <input type="hidden" formControlName="body" />
+      </div>
+
+      <div class="mb-4">
+        <label for="sharedWith" class="block text-sm font-medium mb-1">Condividi</label>
+        <input
+          id="sharedWith"
+          type="text"
+          formControlName="sharedWith"
+          class="w-full notivo-input"
+          placeholder="Inserisci username"
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="tags" class="block text-sm font-medium mb-1">Tag (separati da virgola)</label>
+        <input
+          id="tags"
+          type="text"
+          formControlName="tags"
+          class="w-full notivo-input"
+          placeholder="Inserisci tag"
+        />
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button type="button" class="notivo-btn-outline-primary" (click)="form.reset()">
+          Cancella
+        </button>
+        <button
+          type="submit"
+          [disabled]="form.invalid || submitting()"
+          class="notivo-btn-primary"
+          (click)="submit()"
+        >
+          Salva
+        </button>
+      </div>
+    </form>
+  </section>
+</main>

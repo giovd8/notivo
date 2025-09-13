@@ -8,6 +8,7 @@ const DEFAULT_ERROR_MESSAGE = 'Si è verificato un errore imprevisto. Riprova pi
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
+  const authStore = inject(AuthStore);
 
   return next(req).pipe(
     catchError((err: unknown) => {
@@ -15,7 +16,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       // if error is 401, logout
       if (err instanceof HttpErrorResponse && err.status === 401) {
-        inject(AuthStore).logout().subscribe();
+        authStore.logout().subscribe();
       }
 
       if (err instanceof HttpErrorResponse) {

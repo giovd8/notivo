@@ -1,4 +1,5 @@
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { catchError, share, tap } from 'rxjs';
 import { NotivoResponse } from '../core/models';
@@ -20,6 +21,7 @@ export const AuthStore = signalStore(
   withState(initialState),
   withMethods((store) => {
     let authService = inject(AuthService);
+    let router = inject(Router);
 
     return {
       login: (credentials: UserCredential) => {
@@ -74,6 +76,9 @@ export const AuthStore = signalStore(
               isAuthenticated: false,
             });
           }),
+          // finalize(() => {
+          //   router.navigate(['/login']);
+          // }),
           share()
         );
       },
