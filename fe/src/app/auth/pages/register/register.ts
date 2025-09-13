@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormControl,
@@ -42,6 +41,7 @@ export class Register {
   readonly passwordVisible = signal(false);
   readonly confirmPasswordVisible = signal(false);
   isError = signal(false);
+  isUsernameTaken = signal(false);
   readonly form = new FormGroup(
     {
       username: new FormControl<string>('', {
@@ -60,12 +60,6 @@ export class Register {
     { validators: passwordsMatchValidator() }
   );
 
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.isError.set(false);
-    });
-  }
-
   submit() {
     if (this.submitting()) return;
     if (this.form.invalid) {
@@ -74,6 +68,7 @@ export class Register {
     }
 
     this.isError.set(false);
+    this.isUsernameTaken.set(false);
     this.submitting.set(true);
     this.auth
       .register(this.form.value as UserCredential)
@@ -82,9 +77,13 @@ export class Register {
         next: () => {
           this.router.navigate(['/']);
         },
-        error: () => {
+        error: (err) => {
           this.submitting.set(false);
-          this.isError.set(true);
+          if (err.status === 409) {
+            this.isUsernameTaken.set(true);
+          } else {
+            this.isError.set(true);
+          }
         },
       });
   }

@@ -139,6 +139,12 @@
         }
       </div>
 
+      @if (isError()) {
+      <p class="text-xs text-red-600 mt-1" role="alert">Si è verificato un errore</p>
+      } @if (isUsernameTaken()) {
+      <p class="text-xs text-red-600 mt-1" role="alert">Username non disponibile</p>
+      }
+
       <button
         type="submit"
         class="notivo-btn-primary w-full justify-center h-10"

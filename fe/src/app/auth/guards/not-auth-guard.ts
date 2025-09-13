@@ -11,6 +11,12 @@ export const notAuthGuard: CanActivateFn = (_route, state) => {
     return router.createUrlTree(['/'], { queryParams: { redirect: state.url } });
   }
 
+  if (
+    window.location.pathname.includes('/login') ||
+    window.location.pathname.includes('/register')
+  ) {
+    return true;
+  }
   return store.refresh().pipe(
     map(() => router.createUrlTree(['/'])),
     catchError(() => of(true))

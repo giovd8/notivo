@@ -80,10 +80,6 @@
         }
       </div>
 
-      @if (isError()) {
-      <p class="text-xs text-red-600 mt-1" role="alert">Credenziali non valide.</p>
-      }
-
       <button
         type="submit"
         class="notivo-btn-primary w-full justify-center h-10"
@@ -97,15 +93,6 @@
         @if (!submitting()) { Accedi } @else { Accesso in corso... }
       </button>
     </form>
-
-    <mat-form-field>
-      <mat-label>Toppings</mat-label>
-      <mat-select [formControl]="toppings" multiple panelClass="notivo-input">
-        @for (topping of toppingList; track topping) {
-        <mat-option [value]="topping">{{ topping }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
 
     <p class="text-xs text-gray-500 mt-6 text-center">
       Non hai un account?

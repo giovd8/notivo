@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { NotivoResponse } from '../core/models';
 import { Note, NotePayload } from '../shared/models/note';
+import { User } from '../shared/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -36,5 +37,9 @@ export class ApiService {
 
   deleteNote(id: string): Observable<void> {
     return this.http.delete<void>(`/api/note/notes/${id}`, { withCredentials: true });
+  }
+
+  getUser(): Observable<User> {
+    return this.http.get<User>(`/api/user/user`, { withCredentials: true });
   }
 }

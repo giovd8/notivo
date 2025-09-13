@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormGroup,
@@ -31,9 +30,6 @@ import { Header } from '../../shared/components/header/header';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
-  toppings = new FormControl('');
-  toppingList: string[] = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
-
   readonly router = inject(Router);
   readonly store = inject(AuthStore);
   readonly submitting = signal(false);
@@ -50,12 +46,6 @@ export class Login {
       validators: [Validators.required, Validators.minLength(5)],
     }),
   });
-
-  constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.isError.set(false);
-    });
-  }
 
   submit() {
     if (this.submitting()) return;
