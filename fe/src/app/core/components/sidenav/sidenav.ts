@@ -1,7 +1,6 @@
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, Scroll } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import packageJson from '../../../../../package.json';
 import { AuthStore } from '../../../auth/auth.store';
@@ -31,18 +30,14 @@ export class Sidenav {
   version = signal<string>(packageJson.version);
 
   constructor() {
-    // Router events subscription
-    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
-      if (event instanceof NavigationEnd || event instanceof Scroll) {
-        // Used scroll with NavigationEnd because on refresh page (after modified auth guard) NavigationEnd is not triggered
-        if (event instanceof NavigationEnd) this.currentRoute = event.url;
-        else this.currentRoute = event.routerEvent.url;
-      }
-    });
-  }
-
-  async itemClickedHandler(item: SidenavItem): Promise<void> {
-    await this.router.navigate([item.route]);
+    // // Router events subscription
+    // this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+    //   if (event instanceof NavigationEnd || event instanceof Scroll) {
+    //     // Used scroll with NavigationEnd because on refresh page (after modified auth guard) NavigationEnd is not triggered
+    //     if (event instanceof NavigationEnd) this.currentRoute = event.url;
+    //     else this.currentRoute = event.routerEvent.url;
+    //   }
+    // });
   }
 
   logout(): void {

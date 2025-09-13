@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { ApiService } from '../../../services/api';
 import { UserCredential } from '../../../shared/models/user';
 import { AuthStore } from '../../auth.store';
 import { Header } from '../../shared/components/header/header';
@@ -18,7 +17,6 @@ import { Header } from '../../shared/components/header/header';
 export class Login {
   readonly router = inject(Router);
   readonly store = inject(AuthStore);
-  readonly apiService = inject(ApiService);
   readonly submitting = signal(false);
   readonly passwordVisible = signal(false);
   isError = signal(false);
@@ -64,9 +62,5 @@ export class Login {
 
   togglePasswordVisibility() {
     this.passwordVisible.update((v) => !v);
-  }
-
-  test() {
-    this.apiService.test();
   }
 }

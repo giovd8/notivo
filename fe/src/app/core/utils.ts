@@ -4,7 +4,7 @@ export const sidenavItems: SidenavItem[] = [
   {
     title: 'Home',
     icon: 'bi bi-house',
-    route: '/',
+    route: '/home',
     spacing: false,
   },
   {
@@ -16,13 +16,13 @@ export const sidenavItems: SidenavItem[] = [
   {
     title: 'Le mie note',
     icon: 'bi bi-file-earmark-person',
-    route: '/my-notes',
+    route: 'notes/my',
     spacing: false,
   },
   {
     title: 'Condivise con me',
     icon: 'bi bi-people',
-    route: '/shared',
+    route: 'notes/shared',
     spacing: false,
   },
 ];
