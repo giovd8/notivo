@@ -17,7 +17,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       let message = DEFAULT_ERROR_MESSAGE;
 
       // if error is 401, logout
-      if (err instanceof HttpErrorResponse && err.status === 401 && !req.url.includes('auth')) {
+      if (err instanceof HttpErrorResponse && err.status === 401 && !req.url.includes('/login')) {
         authStore
           .logout()
           .pipe(finalize(() => router.navigate(['/login'])))

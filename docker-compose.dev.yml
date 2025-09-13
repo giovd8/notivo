@@ -20,8 +20,8 @@ services:
     environment:
       NODE_ENV: development
       JWT_ACCESS_SECRET: dev-access-secret
-      AUTH_SERVICE_URL: http://auth-service:3000
-      NOTE_SERVICE_URL: http://note-service:3000
+      AUTH_SERVICE_URL: http://auth-service:3001
+      NOTE_SERVICE_URL: http://note-service:3002
       CORS_ORIGIN: https://localhost
     depends_on:
       - auth-service
