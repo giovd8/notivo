@@ -1,47 +1,51 @@
-import express, { Request, Response } from "express";
-import mongoose from "mongoose";
-import { Pool } from "pg";
+import cookieParser from "cookie-parser";
+import dotenv from 'dotenv';
+import express from "express";
+import http from "http";
+import { closeMongo, initMongo } from "./configs/mongo";
+import { getDbPool, initPostgres } from "./configs/postgres";
+import noteRoutes from "./routes/note.routes";
 
-const app = express();
-const port = process.env.PORT || 3000;
+dotenv.config();
 
-const mongoConnect = async () => {
-  const mongoHost = process.env.MONGO_HOST || "localhost";
-  const mongoPort = process.env.MONGO_PORT || "27017";
-  const mongoDb = process.env.MONGO_DB || "notivo";
-  const mongoUser = process.env.MONGO_USER;
-  const mongoPass = process.env.MONGO_PASSWORD;
-  const authPart = mongoUser && mongoPass ? `${mongoUser}:${mongoPass}@` : "";
-  const uri = process.env.MONGO_URI || `mongodb://${authPart}${mongoHost}:${mongoPort}/${mongoDb}`;
-  await mongoose.connect(uri);
-  console.log("MongoDB connected");
+export const createApp = () => {
+  const app = express();
+  app.use(express.json());
+  app.use(cookieParser());
+  app.use("/", noteRoutes);
+  return app;
 };
 
-let pgPool: Pool | null = null;
-const postgresConnect = async () => {
-  const host = process.env.POSTGRES_HOST || "localhost";
-  const port = Number(process.env.POSTGRES_PORT || 5432);
-  const user = process.env.PGUSER || "user";
-  const password = process.env.PGPASSWORD || "pass";
-  const database = process.env.PGDATABASE || "mydb";
-  pgPool = new Pool({ host, port, user, password, database });
-  await pgPool.query("SELECT 1");
-  console.log("Postgres connected");
+const start = async () => {
+  await Promise.all([initPostgres(), initMongo()]);
+  const app = createApp();
+  const port = Number(process.env.PORT || 3000);
+  const server = http.createServer(app);
+
+  const shutdown = async (signal: string) => {
+    console.log(`Received ${signal}. Shutting down...`);
+    server.close(async () => {
+      try {
+        const pool = getDbPool();
+        await pool.end();
+        await closeMongo();
+      } catch (e) {
+        // noop
+      } finally {
+        process.exit(0);
+      }
+    });
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+  server.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
 };
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello from note service");
+start().catch((err) => {
+  console.error("Startup error", err);
+  process.exit(1);
 });
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-(async () => {
-  try {
-    await Promise.all([mongoConnect(), postgresConnect()]);
-  } catch (err) {
-    console.error("Database connection error", err);
-    process.exit(1);
-  }
-})();

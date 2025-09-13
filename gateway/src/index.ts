@@ -13,7 +13,7 @@ import { commonProxyOptions } from "./configs/proxy";
 import { authMiddleware } from "./middlewares/auth";
 const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z.enum(["development", "production"]).default("development"),
   AUTH_SERVICE_URL: z.string().url().default("http://auth-service:3000"),
   NOTE_SERVICE_URL: z.string().url().default("http://note-service:3000"),
   CORS_ORIGIN: z.string().optional(),
@@ -33,8 +33,10 @@ const httpLogger = pinoHttp({
   },
 });
 app.use(httpLogger);
-
-app.use(limiter);
+if (env.NODE_ENV !== "development") {
+  // app.use(morgan("dev"));
+  app.use(limiter);
+}
 
 app.use(helmet()); // set security headers
 app.use(

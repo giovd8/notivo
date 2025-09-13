@@ -24,6 +24,8 @@ export class ApiService {
   }
 
   createNote(payload: NotePayload) {
-    return this.http.post<NotivoResponse<Note>>(`/api/note/notes`, payload);
+    return this.http.post<NotivoResponse<Note>>(`/api/note/notes`, payload, {
+      withCredentials: true,
+    });
   }
 }

@@ -17,6 +17,12 @@ services:
     volumes:
       - ./gateway:/app
       - /app/node_modules
+    environment:
+      NODE_ENV: development
+      JWT_ACCESS_SECRET: dev-access-secret
+      AUTH_SERVICE_URL: http://auth-service:3000
+      NOTE_SERVICE_URL: http://note-service:3000
+      CORS_ORIGIN: https://localhost
     depends_on:
       - auth-service
       - note-service
@@ -28,6 +34,9 @@ services:
       - ./services/auth:/app
       - /app/node_modules
     environment:
+      NODE_ENV: development
+      JWT_ACCESS_SECRET: dev-access-secret
+      JWT_REFRESH_SECRET: dev-refresh-secret
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: user
@@ -40,6 +49,9 @@ services:
       MONGO_PASSWORD: pass
       MONGO_DB: notivo
       MONGO_AUTH_SOURCE: admin
+    depends_on:
+      - postgres
+      - mongo
 
   note-service:
     build:
@@ -61,6 +73,9 @@ services:
       MONGO_PASSWORD: pass
       MONGO_DB: notivo
       MONGO_AUTH_SOURCE: admin
+    depends_on:
+      - postgres
+      - mongo
 
   postgres:
     image: postgres:15
