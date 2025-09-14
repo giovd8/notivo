@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../../auth/auth.store';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
+import { ModalService } from '../../../services/modal.service';
+import { Modal } from '../../../shared/components/modal/modal';
 import { Spinner } from '../../../shared/components/spinner/spinner';
 import { Tooltip } from '../../../shared/components/tooltip/tooltip';
 import { Note } from '../../../shared/models/note';
@@ -11,7 +13,7 @@ import { NoteStore } from '../../stores/note';
 
 @Component({
   selector: 'notivo-note-details',
-  imports: [RouterLink, NgClass, DatePipe, Tooltip, Spinner],
+  imports: [RouterLink, NgClass, DatePipe, Tooltip, Spinner, Modal],
   templateUrl: './note-details.html',
   styles: `
     :host { display: block; }
@@ -24,7 +26,7 @@ export class NoteDetails {
   private readonly auth = inject(AuthStore);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
-
+  private readonly modalService = inject(ModalService);
   protected readonly isLoading: Signal<boolean> = computed(() => this.noteStore.loading());
   private readonly noteId: string = this.route.snapshot.paramMap.get('id') ?? '';
   protected readonly note: Signal<Note | undefined> = computed(() =>
@@ -64,6 +66,14 @@ export class NoteDetails {
   protected canDelete(note: Note | undefined): boolean {
     const userId = this.currentUserId() ?? '';
     return !!note && note.ownerId === userId;
+  }
+
+  openDeleteModal(): void {
+    this.modalService.open({
+      title: 'Elimina nota',
+      body: 'Sei sicuro di voler eliminare questa nota?',
+      onConfirm: () => this.deleteNote(),
+    });
   }
 
   protected deleteNote(): void {

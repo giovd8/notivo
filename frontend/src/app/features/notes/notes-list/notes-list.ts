@@ -11,10 +11,11 @@ import { Tooltip } from '../../../shared/components/tooltip/tooltip';
 import { Note } from '../../../shared/models/note';
 import { CommonStore } from '../../stores/common';
 import { NoteStore } from '../../stores/note';
+import { NotesLegend } from '../components/notes-legend/notes-legend';
 
 @Component({
   selector: 'notivo-notes-list',
-  imports: [RouterLink, NgClass, DatePipe, Tooltip, Spinner, SearchBar, Multiselect],
+  imports: [RouterLink, NgClass, DatePipe, Tooltip, Spinner, SearchBar, Multiselect, NotesLegend],
   templateUrl: './notes-list.html',
   styles: `
     .clamp-10 {

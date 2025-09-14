@@ -1,0 +1,1071 @@
+openapi: 3.0.3
+info:
+  title: Notivo API
+  description: |
+    API completa per l'applicazione Notivo - un sistema di gestione note condivise.
+    
+    L'architettura è basata su microservizi:
+    - **Auth Service**: Gestione autenticazione e autorizzazione
+    - **Notes Service**: Gestione note e tag
+    - **Users Service**: Gestione utenti
+    - **Gateway**: API Gateway che orchestra i servizi e verifica l'autenticazione
+    
+    ## Autenticazione
+    L'API utilizza JWT (JSON Web Tokens) per l'autenticazione. I token vengono gestiti tramite cookie HTTP-only per maggiore sicurezza.
+    L'autenticazione avviene tramite il gateway che verifica il token JWT nel cookie HTTP-only.
+    Se il token è valido, il gateway instrada la richiesta al microservizio corrispondente.
+    Se il token non è valido, il gateway risponde con un errore 401.
+    Se il token è mancante, il gateway risponde con un errore 401.
+    Se il token è scaduto, il gateway risponde con un errore 401.
+    Se il token è invalidato, il gateway risponde con un errore 401.
+    
+    ## Rate Limiting
+    In ambiente di produzione è attivo il rate limiting per prevenire abusi.
+    
+    ## CORS
+    L'API supporta CORS configurato per consentire richieste cross-origin dal frontend.
+  version: 1.0.0
+  contact:
+    name: Giovanni Vidotto
+    email: giovanni.vidotto@hotmail.it
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  # - url: https://api.notivo.com
+  #   description: Production server
+
+tags:
+  - name: Authentication
+    description: Operazioni di autenticazione e gestione sessioni
+  - name: Notes
+    description: Gestione note e contenuti
+  - name: Tags
+    description: Gestione tag per categorizzazione
+  - name: Users
+    description: Gestione utenti e profili
+  - name: Health
+    description: Endpoint di monitoraggio e salute del sistema
+
+paths:
+  # Health endpoints
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Verifica lo stato di salute del gateway
+      responses:
+        '200':
+          description: Servizio operativo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ok"
+
+  /ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness check
+      description: Verifica che il servizio sia pronto a ricevere traffico
+      responses:
+        '200':
+          description: Servizio pronto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ready"
+
+  # Authentication endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Registra un nuovo utente
+      description: Crea un nuovo account utente e effettua automaticamente il login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentialDTO'
+            example:
+              username: "mario.rossi"
+              password: "password123"
+      responses:
+        '201':
+          description: Utente creato con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserDTO'
+          headers:
+            Set-Cookie:
+              description: Cookie di autenticazione impostati
+              schema:
+                type: string
+                example: "accessToken=eyJ...; HttpOnly; Path=/"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Username già esistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login utente
+      description: Autentica un utente esistente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentialDTO'
+            example:
+              username: "mario.rossi"
+              password: "password123"
+      responses:
+        '200':
+          description: Login effettuato con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserDTO'
+          headers:
+            Set-Cookie:
+              description: Cookie di autenticazione impostati
+              schema:
+                type: string
+                example: "accessToken=eyJ...; HttpOnly; Path=/"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Rinnova i token di accesso
+      description: Rinnova i token di accesso utilizzando il refresh token
+      responses:
+        '200':
+          description: Token rinnovati con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserDTO'
+          headers:
+            Set-Cookie:
+              description: Nuovi cookie di autenticazione impostati
+              schema:
+                type: string
+                example: "accessToken=eyJ...; HttpOnly; Path=/"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout utente
+      description: Disconnette l'utente e invalida i token
+      responses:
+        '204':
+          description: Logout effettuato con successo
+          headers:
+            Set-Cookie:
+              description: Cookie di autenticazione rimossi
+              schema:
+                type: string
+                example: "accessToken=; HttpOnly; Path=/; Max-Age=0"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/register/test-users:
+    post:
+      tags:
+        - Authentication
+      summary: Crea utenti di test
+      description: Endpoint per creare utenti di test in batch (pubblico)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/UserCredentialDTO'
+              example:
+                users:
+                  - username: "test1"
+                    password: "password123"
+                  - username: "test2"
+                    password: "password123"
+      responses:
+        '200':
+          description: Utenti di test creati con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # Notes endpoints
+  /notes:
+    get:
+      tags:
+        - Notes
+      summary: Lista note
+      description: Recupera la lista delle note dell'utente con filtri opzionali
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: search
+          in: query
+          description: Testo per ricerca nelle note
+          required: false
+          schema:
+            type: string
+            example: "riunione"
+        - name: tags
+          in: query
+          description: Tag separati da virgola per filtrare le note
+          required: false
+          schema:
+            type: string
+            example: "lavoro,importante"
+      responses:
+        '200':
+          description: Lista note recuperata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NoteDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Notes
+      summary: Crea una nuova nota
+      description: Crea una nuova nota per l'utente autenticato
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNoteEntity'
+            example:
+              title: "Riunione settimanale"
+              body: "Discussione sui progressi del progetto e prossimi obiettivi"
+              sharedWith: ["mario.rossi", "giulia.verdi"]
+              tags: ["lavoro", "riunione"]
+      responses:
+        '201':
+          description: Nota creata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/NoteDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notes/{id}:
+    put:
+      tags:
+        - Notes
+      summary: Aggiorna una nota
+      description: Aggiorna una nota esistente dell'utente autenticato
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID della nota da aggiornare
+          schema:
+            type: string
+            example: "64f8a1b2c3d4e5f6a7b8c9d0"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNoteEntity'
+            example:
+              title: "Riunione settimanale aggiornata"
+              body: "Discussione sui progressi del progetto e prossimi obiettivi - AGGIORNATO"
+              sharedWith: ["mario.rossi", "giulia.verdi", "luca.bianchi"]
+              tags: ["lavoro", "riunione", "aggiornato"]
+      responses:
+        '200':
+          description: Nota aggiornata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/NoteDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Notes
+      summary: Elimina una nota
+      description: Elimina una nota dell'utente autenticato
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID della nota da eliminare
+          schema:
+            type: string
+            example: "64f8a1b2c3d4e5f6a7b8c9d0"
+      responses:
+        '204':
+          description: Nota eliminata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: "null"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notes/test-notes:
+    post:
+      tags:
+        - Notes
+      summary: Crea note di test
+      description: Endpoint per creare note di test in batch (pubblico)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TestNoteInput'
+      responses:
+        '201':
+          description: Note di test create con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NoteDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # Tags endpoints
+  /notes/tags:
+    get:
+      tags:
+        - Tags
+      summary: Lista tutti i tag
+      description: Recupera la lista di tutti i tag disponibili
+      responses:
+        '200':
+          description: Lista tag recuperata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LabelValue'
+
+    post:
+      tags:
+        - Tags
+      summary: Crea nuovi tag
+      description: Crea o aggiorna tag esistenti (pubblico)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagsRequestDTO'
+            example:
+              tags: ["lavoro", "personale", "importante", "riunione"]
+      responses:
+        '201':
+          description: Tag creati/aggiornati con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TagEntity'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # Users endpoints
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Lista utenti
+      description: Recupera la lista degli altri utenti (escluso l'utente corrente)
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Lista utenti recuperata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LabelValue'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Users
+      summary: Crea un nuovo utente
+      description: Crea un nuovo utente nel sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Nome utente univoco
+                  example: "nuovo.utente"
+              required:
+                - username
+      responses:
+        '201':
+          description: Utente creato con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Username già esistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Recupera utente per ID
+      description: Recupera i dettagli di un utente specifico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID dell'utente
+          schema:
+            type: string
+            example: "64f8a1b2c3d4e5f6a7b8c9d0"
+      responses:
+        '200':
+          description: Utente recuperato con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserDTO'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/search/by-username:
+    get:
+      tags:
+        - Users
+      summary: Cerca utente per username
+      description: Recupera i dettagli di un utente tramite username
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: Username dell'utente da cercare
+          schema:
+            type: string
+            example: "mario.rossi"
+      responses:
+        '200':
+          description: Utente trovato con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NotivoResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+      description: JWT token di accesso memorizzato in cookie HTTP-only
+
+  schemas:
+    # Response schemas
+    NotivoResponse:
+      type: object
+      properties:
+        data:
+          description: Dati della risposta
+        message:
+          type: string
+          description: Messaggio descrittivo della risposta
+          example: "Operazione completata con successo"
+      required:
+        - data
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        data:
+          type: "null"
+        message:
+          type: string
+          description: Messaggio di errore
+          example: "Errore durante l'operazione"
+      required:
+        - data
+        - message
+
+    # User schemas
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco dell'utente
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        username:
+          type: string
+          description: Nome utente univoco
+          example: "mario.rossi"
+        passwordHash:
+          type: string
+          description: Hash della password (solo per entità interne)
+          example: "$2b$10$..."
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione dell'utente
+          example: "2023-09-01T10:00:00.000Z"
+      required:
+        - id
+        - username
+        - passwordHash
+        - createdAt
+
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco dell'utente
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        username:
+          type: string
+          description: Nome utente univoco
+          example: "mario.rossi"
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione dell'utente
+          example: "2023-09-01T10:00:00.000Z"
+      required:
+        - id
+        - username
+        - createdAt
+
+    UserCredentialDTO:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nome utente
+          example: "mario.rossi"
+        password:
+          type: string
+          description: Password dell'utente
+          example: "password123"
+          minLength: 6
+      required:
+        - username
+        - password
+
+    # Note schemas
+    NoteEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco della nota
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        title:
+          type: string
+          description: Titolo della nota
+          example: "Riunione settimanale"
+        body:
+          type: string
+          description: Contenuto della nota
+          example: "Discussione sui progressi del progetto e prossimi obiettivi"
+        ownerId:
+          type: string
+          description: ID del proprietario della nota
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione della nota
+          example: "2023-09-01T10:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data dell'ultimo aggiornamento della nota
+          example: "2023-09-01T15:30:00.000Z"
+      required:
+        - id
+        - title
+        - body
+        - ownerId
+        - createdAt
+        - updatedAt
+
+    CreateNoteEntity:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Titolo della nota
+          example: "Riunione settimanale"
+        body:
+          type: string
+          description: Contenuto della nota
+          example: "Discussione sui progressi del progetto e prossimi obiettivi"
+        sharedWith:
+          type: array
+          items:
+            type: string
+          description: Lista degli username con cui condividere la nota
+          example: ["mario.rossi", "giulia.verdi"]
+        tags:
+          type: array
+          items:
+            type: string
+          description: Lista dei tag associati alla nota
+          example: ["lavoro", "riunione"]
+      required:
+        - title
+        - body
+
+    UpdateNoteEntity:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Nuovo titolo della nota
+          example: "Riunione settimanale aggiornata"
+        body:
+          type: string
+          description: Nuovo contenuto della nota
+          example: "Discussione sui progressi del progetto e prossimi obiettivi - AGGIORNATO"
+        sharedWith:
+          type: array
+          items:
+            type: string
+          description: Lista aggiornata degli username con cui condividere la nota
+          example: ["mario.rossi", "giulia.verdi", "luca.bianchi"]
+        tags:
+          type: array
+          items:
+            type: string
+          description: Lista aggiornata dei tag associati alla nota
+          example: ["lavoro", "riunione", "aggiornato"]
+
+    NoteDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco della nota
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        title:
+          type: string
+          description: Titolo della nota
+          example: "Riunione settimanale"
+        body:
+          type: string
+          description: Contenuto della nota
+          example: "Discussione sui progressi del progetto e prossimi obiettivi"
+        ownerId:
+          type: string
+          description: ID del proprietario della nota
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        sharedWith:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabelValue'
+          description: Lista degli utenti con cui è condivisa la nota
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabelValue'
+          description: Lista dei tag associati alla nota
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione della nota
+          example: "2023-09-01T10:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data dell'ultimo aggiornamento della nota
+          example: "2023-09-01T15:30:00.000Z"
+      required:
+        - id
+        - title
+        - body
+        - ownerId
+        - sharedWith
+        - tags
+        - createdAt
+        - updatedAt
+
+    TestNoteInput:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID della nota di test
+          example: "test-note-1"
+        title:
+          type: string
+          description: Titolo della nota di test
+          example: "Nota di test"
+        body:
+          type: string
+          description: Contenuto della nota di test
+          example: "Questo è il contenuto di una nota di test"
+        ownerId:
+          type: string
+          description: Username del proprietario della nota di test
+          example: "mario.rossi"
+        sharedWith:
+          type: array
+          items:
+            type: string
+          description: Lista degli username con cui condividere la nota di test
+          example: ["giulia.verdi"]
+        tags:
+          type: array
+          items:
+            type: string
+          description: Lista dei tag per la nota di test
+          example: ["test", "esempio"]
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione della nota di test
+          example: "2023-09-01T10:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data dell'ultimo aggiornamento della nota di test
+          example: "2023-09-01T10:00:00.000Z"
+      required:
+        - id
+        - title
+        - body
+        - ownerId
+        - sharedWith
+        - tags
+        - createdAt
+        - updatedAt
+
+    # Tag schemas
+    TagEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco del tag
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        name:
+          type: string
+          description: Nome del tag
+          example: "lavoro"
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione del tag
+          example: "2023-09-01T10:00:00.000Z"
+      required:
+        - id
+        - name
+        - createdAt
+
+    TagsRequestDTO:
+      type: object
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Lista dei nomi dei tag da creare/aggiornare
+          example: ["lavoro", "personale", "importante", "riunione"]
+      required:
+        - tags
+
+    TagDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco del tag
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        name:
+          type: string
+          description: Nome del tag
+          example: "lavoro"
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione del tag
+          example: "2023-09-01T10:00:00.000Z"
+      required:
+        - id
+        - name
+        - createdAt
+
+    # Utility schemas
+    LabelValue:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Etichetta visualizzata
+          example: "Mario Rossi"
+        value:
+          type: string
+          description: Valore identificativo
+          example: "mario.rossi"
+      required:
+        - label
+        - value
+
+    # Session schemas
+    SessionDocument:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID univoco della sessione
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        userId:
+          type: string
+          description: ID dell'utente proprietario della sessione
+          example: "64f8a1b2c3d4e5f6a7b8c9d0"
+        token:
+          type: string
+          description: Token di accesso JWT
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: Token di refresh JWT
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        createdAt:
+          type: string
+          format: date-time
+          description: Data di creazione della sessione
+          example: "2023-09-01T10:00:00.000Z"
+        expiresAt:
+          type: string
+          format: date-time
+          description: Data di scadenza della sessione
+          example: "2023-09-08T10:00:00.000Z"
+        metadata:
+          type: object
+          properties:
+            ip:
+              type: string
+              description: Indirizzo IP della richiesta
+              example: "192.168.1.100"
+            userAgent:
+              type: string
+              description: User agent del browser
+              example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      required:
+        - userId
+        - token
+        - refreshToken
+        - createdAt
+        - expiresAt
+
+  responses:
+    BadRequest:
+      description: Richiesta non valida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            data: null
+            message: "Username and password are required"
+
+    Unauthorized:
+      description: Non autorizzato - token mancante o non valido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            data: null
+            message: "Unauthorized"
+
+    NotFound:
+      description: Risorsa non trovata
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            data: null
+            message: "Not Found"
+
+    InternalServerError:
+      description: Errore interno del server
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            data: null
+            message: "Internal server error"
+
+security:
+  - cookieAuth: []

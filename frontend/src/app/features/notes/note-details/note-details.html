@@ -15,20 +15,7 @@
     <h2 class="text-lg font-medium">Nota non trovata</h2>
     <a class="notivo-btn-primary notivo-focus" routerLink="/notes">Torna alle note</a>
   </div>
-  } @else { @if(canDelete(note())) {
-  <div class="flex items-center gap-2 justify-end mb-4">
-    <a
-      class="notivo-btn-outline-primary notivo-focus"
-      [routerLink]="['/notes', 'edit', note()!.id]"
-    >
-      <span>Modifica</span>
-    </a>
-    <button class="notivo-btn-danger-outline notivo-focus" type="button" (click)="deleteNote()">
-      <span>Elimina</span>
-    </button>
-  </div>
-  }
-
+  } @else {
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between gap-2">
       <h1 class="text-2xl font-semibold">{{ note()!.title }}</h1>
@@ -46,31 +33,61 @@
         </notivo-tooltip>
         }
         <span>{{ note()!.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
+        @if(canDelete(note())) {
+        <div class="flex items-center gap-2 justify-end ml-6">
+          <a
+            class="notivo-btn-outline-primary notivo-focus"
+            [routerLink]="['/notes', 'edit', note()!.id]"
+          >
+            <span>Modifica</span>
+          </a>
+          <button
+            class="notivo-btn-danger-outline notivo-focus"
+            type="button"
+            (click)="openDeleteModal()"
+          >
+            <span>Elimina</span>
+          </button>
+        </div>
+        }
       </div>
     </div>
 
     <div class="flex items-center gap-6 justify-between">
-      @if(note()!.tags && note()!.tags!.length > 0) {
-      <div class="flex items-center gap-2 mt-2 flex-wrap">
-        @for(tag of note()!.tags; track tag.value) {
-        <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">
-          {{ tag.label }}
-        </span>
+      <div class="flex flex-col flex-1">
+        <span class="text-sm font-medium">Tag</span>
+        @if(note()!.tags && note()!.tags!.length > 0) {
+        <div class="flex items-center gap-2 mt-2 flex-wrap">
+          @for(tag of note()!.tags; track tag.value) {
+          <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">
+            {{ tag.label }}
+          </span>
+          }
+        </div>
+        } @else {
+        <p class="text-sm text-dark">Nessun tag</p>
         }
       </div>
-      } @if(note()!.sharedWith && note()!.sharedWith!.length > 0) {
-      <div class="flex items-center gap-2 mt-2 flex-wrap">
-        @for(sharedWith of note()!.sharedWith; track sharedWith.value) {
-        <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize text-xs">
-          {{ sharedWith.label }}
-        </span>
+      <div class="flex flex-col flex-1">
+        <span class="text-sm font-medium">Condivisa con</span>
+        @if(note()!.sharedWith && note()!.sharedWith!.length > 0) {
+        <div class="flex items-center gap-2 mt-2 flex-wrap">
+          @for(sharedWith of note()!.sharedWith; track sharedWith.value) {
+          <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize text-xs">
+            {{ sharedWith.label }}
+          </span>
+          }
+        </div>
+        } @else {
+        <p class="text-sm text-dark">Nessun condiviso</p>
         }
       </div>
-      }
     </div>
-    <div class="rounded-xl p-0 overflow-hidden">
+    <div class="overflow-hidden pt-10">
       <div class="text-sm inner-a" [innerHTML]="note()!.body"></div>
     </div>
   </div>
   }
 </div>
+
+<notivo-modal />
