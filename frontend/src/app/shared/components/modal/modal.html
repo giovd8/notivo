@@ -1,0 +1,51 @@
+@if (isOpen()) {
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-dark/50 backdrop-blur-sm"
+  (click)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="'modal-title'"
+  [attr.aria-describedby]="'modal-body'"
+>
+  <div class="notivo-card flex flex-col gap-6">
+    <div class="flex items-center justify-between gap-4">
+      <h2 id="modal-title" class="text-xl font-semibold text-gray-900">
+        {{ config()?.title }}
+      </h2>
+      <button
+        type="button"
+        class="text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-1"
+        (click)="onClose()"
+        aria-label="Chiudi modale"
+      >
+        <i class="bi bi-x-lg text-xl"></i>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p id="modal-body" class="text-gray-700 leading-relaxed">
+        {{ config()?.body }}
+      </p>
+
+      @if(config()?.elementName) {
+      <p id="modal-element-name" class="text-gray-700 leading-relaxed text-lg font-medium">
+        {{ config()?.elementName }}
+      </p>
+      }
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-4">
+      <button type="button" class="notivo-btn-outline-primary" (click)="onCancel()">
+        {{ config()?.cancelText || 'Annulla' }}
+      </button>
+      <button
+        type="button"
+        [class]="config()?.confirmButtonClass || 'notivo-btn-danger-outline'"
+        (click)="onConfirm()"
+      >
+        {{ config()?.confirmText || 'Conferma eliminazione' }}
+      </button>
+    </div>
+  </div>
+</div>
+}

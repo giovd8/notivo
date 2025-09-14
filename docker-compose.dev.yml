@@ -14,9 +14,12 @@ services:
     build:
       context: ./gateway
       dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
     volumes:
       - ./gateway:/app
       - /app/node_modules
+      - ./swagger.yaml:/app/swagger.yaml:ro
     environment:
       NODE_ENV: development
       JWT_ACCESS_SECRET: dev-access-secret
