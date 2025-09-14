@@ -1,24 +1,22 @@
 import { Routes } from '@angular/router';
 
-const prefix = 'notes';
-
 export const notesRoutes: Routes = [
   {
-    path: prefix,
+    path: '',
     loadComponent: () => import('./notes-list/notes-list').then((m) => m.NotesList),
   },
   {
-    path: `${prefix}/add`,
+    path: 'add',
     loadComponent: () =>
       import('./create-edit-note/create-edit-note').then((m) => m.CreateEditNote),
   },
   {
-    path: `${prefix}/edit/:id`,
+    path: 'edit/:id',
     loadComponent: () =>
       import('./create-edit-note/create-edit-note').then((m) => m.CreateEditNote),
   },
   {
-    path: `${prefix}/:id`,
+    path: ':id',
     loadComponent: () => import('./note-details/note-details').then((m) => m.NoteDetails),
   },
 ];

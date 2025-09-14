@@ -33,7 +33,8 @@ db.createCollection("users_cache");
 //   ], updatedAt: new Date() },
 // ]);
 
-db.createCollection("user_notes_cache");
+// Legacy: user notes cache no longer used
+// db.createCollection("user_notes_cache");
 // db.user_notes_cache.createIndex({ userId: 1 }, { unique: true });
 // db.user_notes_cache.createIndex({ updatedAt: 1 });
 // db.user_notes_cache.insertMany([
@@ -58,4 +59,18 @@ db.createCollection("tags_cache");
 //     { id: "seed-2", name: "urgent", createdAt: new Date() }
 //   ],
 //   updatedAt: new Date()
+// });
+
+// User search cache: stores per-user search results with 24h TTL
+db.createCollection("user_search_cache");
+// Ensure unique key per user and TTL on lastUpdated
+db.user_search_cache.createIndex({ userId: 1, key: 1 }, { unique: true });
+db.user_search_cache.createIndex({ lastUpdated: 1 }, { expireAfterSeconds: 86400 });
+// Example document shape:
+// db.user_search_cache.insertOne({
+//   userId: "123",
+//   key: "progetto|lavoro",
+//   filter: { text: "progetto", tags: ["lavoro"] },
+//   results: [],
+//   lastUpdated: new Date(),
 // });

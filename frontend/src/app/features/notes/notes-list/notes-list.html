@@ -4,6 +4,22 @@
     <a class="notivo-btn-primary notivo-focus" routerLink="/notes/add"> Aggiungi nota </a>
   </div>
 
+  <div class="flex flex-wrap items-center gap-3">
+    <notivo-search-bar
+      [value]="searchText()"
+      placeholder="Cerca nelle note"
+      (searchStringChange)="onSearchTextChange($event)"
+    />
+    <notivo-multiselect
+      [options]="commonStore.tagOptions()"
+      [isLoading]="commonStore.loading()"
+      placeholder="Filtra per tag"
+      (onOptionsSelectedChange)="onTagsChange($event)"
+    />
+    <button class="notivo-btn-outline-primary" type="button" (click)="noteStore.clearFilters()">
+      Pulisci filtri
+    </button>
+  </div>
   @if(isLoading()) {
   <div class="flex flex-col items-center justify-center text-center gap-2 py-10 h-full">
     <notivo-spinner />

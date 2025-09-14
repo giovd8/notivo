@@ -23,9 +23,13 @@ export class NoteService {
   }
 
   getAll(search?: string, tags?: string[]): Observable<NotivoResponse<Note[]>> {
-    const params = new HttpParams();
-    if (search) params.set('search', search);
-    if (tags) params.set('tags', tags.join(','));
+    let params = new HttpParams();
+    if (search && search.trim().length > 0) {
+      params = params.set('search', search.trim());
+    }
+    if (Array.isArray(tags) && tags.length > 0) {
+      params = params.set('tags', tags.join(','));
+    }
     return this.http.get<NotivoResponse<Note[]>>(`/api/notes`, { withCredentials: true, params });
   }
 

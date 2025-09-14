@@ -70,7 +70,8 @@ export const NoteStore = signalStore(
     return {
       load: () => {
         patchState(store, { loading: true });
-        return api.getAll().pipe(
+        const { text, tags } = store.filters();
+        return api.getAll(text, tags).pipe(
           tap((res: NotivoResponse<Note[]>) => {
             patchState(store, { notes: res.data });
           }),
@@ -81,7 +82,8 @@ export const NoteStore = signalStore(
 
       refresh: () => {
         patchState(store, { loading: true });
-        return api.getAll().pipe(
+        const { text, tags } = store.filters();
+        return api.getAll(text, tags).pipe(
           tap((res: NotivoResponse<Note[]>) => {
             patchState(store, { notes: res.data });
           }),
@@ -93,15 +95,53 @@ export const NoteStore = signalStore(
       setSearchText: (text: string) => {
         const current = store.filters();
         patchState(store, { filters: { ...current, text } });
+        // Auto-fetch with current filters
+        patchState(store, { loading: true });
+        const { text: s, tags } = store.filters();
+        api
+          .getAll(s, tags)
+          .pipe(
+            tap((res: NotivoResponse<Note[]>) => {
+              patchState(store, { notes: res.data });
+            }),
+            finalize(() => patchState(store, { loading: false })),
+            share()
+          )
+          .subscribe();
       },
 
       setSelectedTags: (tags: string[]) => {
         const current = store.filters();
         patchState(store, { filters: { ...current, tags } });
+        // Auto-fetch with current filters
+        patchState(store, { loading: true });
+        const { text, tags: currentTags } = store.filters();
+        api
+          .getAll(text, currentTags)
+          .pipe(
+            tap((res: NotivoResponse<Note[]>) => {
+              patchState(store, { notes: res.data });
+            }),
+            finalize(() => patchState(store, { loading: false })),
+            share()
+          )
+          .subscribe();
       },
 
       clearFilters: () => {
         patchState(store, { filters: { text: '', tags: [] } });
+        // Auto-fetch with cleared filters
+        patchState(store, { loading: true });
+        api
+          .getAll('', [])
+          .pipe(
+            tap((res: NotivoResponse<Note[]>) => {
+              patchState(store, { notes: res.data });
+            }),
+            finalize(() => patchState(store, { loading: false })),
+            share()
+          )
+          .subscribe();
       },
 
       create: (payload: NotePayload) => {

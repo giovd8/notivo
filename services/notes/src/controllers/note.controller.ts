@@ -4,6 +4,17 @@ import { NotivoResponse } from "../models/response";
 import noteRepository from "../repositories/note.repository";
 import { ServerError } from "../utils/server-error";
 
+interface TestNoteInput {
+  id: string;
+  title: string;
+  body: string;
+  ownerId: string; // username
+  sharedWith: string[]; // usernames
+  tags: string[]; // tag names
+  createdAt: string;
+  updatedAt: string;
+}
+
 const createNote = async (
   req: Request<{}, {}, CreateNoteEntity>,
   res: Response<NotivoResponse<NoteDTO | null>>
@@ -27,7 +38,13 @@ const listNotes = async (
   try {
     const userId = String(req.headers["x-user-id"] || "");
     if (!userId) throw new ServerError("Unauthorized", 401)
-    const notes = await noteRepository.listNotes(userId);
+    const search = String((req.query?.search ?? "")).trim();
+    const tagsParam = String(req.query?.tags ?? "").trim();
+    const tags = tagsParam ? tagsParam.split(',').map((t) => t.trim()).filter(Boolean) : [];
+    const hasFilters = (search?.length ?? 0) > 0 || (tags.length > 0);
+    const notes = hasFilters
+      ? await noteRepository.searchNotes(userId, search, tags)
+      : await noteRepository.listNotes(userId);
     return res.status(200).json({ message: "Notes fetched", data: notes ?? [] });
   } catch (err: any) {
     throw new ServerError(err?.message, err?.status);
@@ -71,6 +88,23 @@ const deleteNote = async (
   }
 };
 
-export default { createNote, listNotes, updateNote, deleteNote };
+const createTestNotes = async (
+  req: Request<{}, {}, TestNoteInput[]>,
+  res: Response<NotivoResponse<NoteDTO[]>>
+) => {
+  try {
+    const testNotes = req.body || [];
+    if (!Array.isArray(testNotes) || testNotes.length === 0) {
+      throw new ServerError("Test notes array is required", 400);
+    }
+    const notes = await noteRepository.createTestNotes(testNotes);
+    return res.status(201).json({ message: "Test notes created", data: notes });
+  } catch (err: any) {
+    throw new ServerError(err?.message, err?.status);
+  }
+};
+
+
+export default { createNote, listNotes, updateNote, deleteNote, createTestNotes };
 
 

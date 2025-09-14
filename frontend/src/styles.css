@@ -76,7 +76,6 @@ body {
   @apply border border-secondary rounded-b-2xl shadow-lg;
 }
 
-/* Links styling inside rich HTML containers */
 .inner-a a {
   @apply text-primary hover:underline;
 }
