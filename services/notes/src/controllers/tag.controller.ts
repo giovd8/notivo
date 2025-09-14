@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { NotivoResponse } from "../models/response";
 import { TagEntity, TagsRequestDTO } from "../models/tag";
+import { LabelValue } from "../models/utils";
 import repo from "../repositories/tag.repository";
 import { ServerError } from "../utils/server-error";
 
@@ -22,11 +23,12 @@ const createMany = async (
 
 const list = async (
   _req: Request,
-  res: Response<NotivoResponse<TagEntity[]>>
+  res: Response<NotivoResponse<LabelValue[]>>
 ) => {
   try {
-    const tags = await repo.listTags();
-    return res.status(200).json({ message: 'Tags', data: tags });
+    const tags = await repo.listTags() ?? [];
+    const labelValues = tags.map(t => repo.toLabelValueDto(t));
+    return res.status(200).json({ message: 'Tags', data: labelValues ?? [] });
   } catch (err: any) {
     throw new ServerError(err?.message, err?.status);
   }

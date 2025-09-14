@@ -1,6 +1,6 @@
 import { DatePipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, Signal, computed, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../../auth/auth.store';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
@@ -10,35 +10,34 @@ import { Note } from '../../../shared/models/note';
 import { NoteStore } from '../../stores/note';
 
 @Component({
-  selector: 'notivo-notes-list',
+  selector: 'notivo-note-details',
   imports: [RouterLink, NgClass, DatePipe, Tooltip, Spinner],
-  templateUrl: './notes-list.html',
+  templateUrl: './note-details.html',
   styles: `
-    .clamp-10 {
-      display: -webkit-box;
-      -webkit-line-clamp: 10;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    :host { display: block; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotesList {
+export class NoteDetails {
+  private readonly route = inject(ActivatedRoute);
+  private readonly noteStore = inject(NoteStore);
   private readonly auth = inject(AuthStore);
   private readonly toast = inject(ToastService);
-  private readonly noteStore = inject(NoteStore);
   private readonly router = inject(Router);
+
   protected readonly isLoading: Signal<boolean> = computed(() => this.noteStore.loading());
-  protected readonly notes: Signal<Note[]> = computed(() => this.noteStore.filteredNotes());
+  private readonly noteId: string = this.route.snapshot.paramMap.get('id') ?? '';
+  protected readonly note: Signal<Note | undefined> = computed(() =>
+    this.noteStore.filteredNotes().find((n) => n.id === this.noteId)
+  );
   protected readonly currentUserId: Signal<string | null> = computed(
     () => this.auth.user()?.id ?? null
   );
 
-  protected canDelete(note: Note): boolean {
-    return (this.currentUserId() ?? '') === note.ownerId;
-  }
-
-  protected getShareBadge(note: Note): { label: string; colorClass: string; icon: string } | null {
+  protected getShareBadge(
+    note: Note | undefined
+  ): { label: string; colorClass: string; icon: string } | null {
+    if (!note) return null;
     const userId = this.currentUserId();
     if (!userId) return null;
     if (note.ownerId === userId) {
@@ -62,20 +61,22 @@ export class NotesList {
     };
   }
 
-  protected delete(note: Note): void {
-    if (!this.canDelete(note)) return;
-    this.noteStore.remove(note.id).subscribe({
+  protected canDelete(note: Note | undefined): boolean {
+    const userId = this.currentUserId() ?? '';
+    return !!note && note.ownerId === userId;
+  }
+
+  protected deleteNote(): void {
+    const current = this.note();
+    if (!this.canDelete(current)) return;
+    this.noteStore.remove(current!.id).subscribe({
       next: () => {
         this.toast.show({ message: 'Nota eliminata', type: ToastType.Success, seconds: 3 });
+        this.router.navigate(['/notes']);
       },
       error: () => {
         this.toast.show({ message: 'Errore eliminazione nota', type: ToastType.Error, seconds: 5 });
       },
     });
-  }
-
-  protected openDetails(id: string): void {
-    if (!id) return;
-    this.router.navigate(['/notes', id]);
   }
 }

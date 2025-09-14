@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   inject,
   signal,
@@ -19,6 +20,7 @@ import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
 import { NoteService } from '../../../services/note';
 import { Multiselect } from '../../../shared/components/multiselect/multiselect';
+import { CommonStore } from '../../stores/common';
 
 @Component({
   selector: 'notivo-create-edit-note',
@@ -32,6 +34,10 @@ export class CreateEditNote {
   private readonly api = inject(NoteService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly commonStore = inject(CommonStore);
+  readonly tagOtions = computed(() => this.commonStore.tagOptions());
+  readonly userOptions = computed(() => this.commonStore.userOptions());
+  readonly isLoadingDataFromStore = computed(() => this.commonStore.loading());
 
   readonly submitting = signal(false);
 
@@ -53,8 +59,8 @@ export class CreateEditNote {
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(120)]],
     body: ['', [this.requiredRichText]],
-    sharedWith: this.fb.nonNullable.control<string>(''),
-    tags: this.fb.nonNullable.control<string>(''),
+    sharedWith: this.fb.nonNullable.control<string[]>([]),
+    tags: this.fb.nonNullable.control<string[]>([]),
   });
 
   async ngAfterViewInit(): Promise<void> {
@@ -111,16 +117,8 @@ export class CreateEditNote {
     if (this.form.invalid || this.submitting()) return;
     this.submitting.set(true);
 
-    const sharedWith =
-      this.form.value.sharedWith
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
-    const tags =
-      this.form.value.tags
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
+    const sharedWith = this.form.value.sharedWith ?? [];
+    const tags = this.form.value.tags ?? [];
 
     this.api
       .createOne({
@@ -152,7 +150,10 @@ export class CreateEditNote {
   }
 
   onSharedWithSelectedChange(users: string[]) {
-    console.log('onSharedWithSelectedChange', users);
-    console.log(users);
+    this.form.controls.sharedWith.setValue(users);
+  }
+
+  onTagsSelectedChange(tags: string[]) {
+    this.form.controls.tags.setValue(tags);
   }
 }

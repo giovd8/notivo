@@ -2,6 +2,7 @@ import { getDbPool } from "../configs/postgres";
 import { UserDTO, UserEntity } from "../models/user";
 import UserNotesCacheModel from "../models/user-notes-cache";
 import UsersCacheModel, { CachedUser } from "../models/users-cache";
+import { LabelValue } from "../models/utils";
 
 const createUser = async (username: string): Promise<UserEntity> => {
   const pool = getDbPool();
@@ -63,8 +64,6 @@ const toUserDTO = (user: UserEntity): UserDTO => ({
   createdAt: user.createdAt,
 });
 
-export default { listUsers, toUserDTO, createUser, findUserById, findUserByUsername };
-
 const updateUsersCacheOnCreate = async (newUser: UserEntity): Promise<void> => {
   const pool = getDbPool();
   const allUsersResult = await pool.query<{ id: string; username: string; createdAt: Date }>(
@@ -84,3 +83,21 @@ const updateUsersCacheOnCreate = async (newUser: UserEntity): Promise<void> => {
     { $addToSet: { others: newUserCached }, $set: { updatedAt: new Date() } }
   );
 };
+
+const listUsersFromCache = async (requestingUserId: string): Promise<CachedUser[]> => {
+  const cache = await UsersCacheModel.findOne({ userId: requestingUserId }).lean();
+  if (!cache) return [];
+  return cache.others as unknown as CachedUser[];
+};
+
+const toLabelValueFromCached = (user: CachedUser): LabelValue => ({
+  label: user.username,
+  value: user.id,
+});
+
+export default { listUsers, toUserDTO, createUser, findUserById, findUserByUsername, updateUsersCacheOnCreate, listUsersFromCache, toLabelValueFromCached };
+ 
+// Cache-based APIs
+
+
+

@@ -1,0 +1,77 @@
+<div class="h-full w-full p-4 flex flex-col gap-4">
+  @if(isLoading()) {
+  <div class="flex flex-col items-center justify-center text-center gap-2 py-10 h-full">
+    <notivo-spinner />
+    <p class="text-dark">Caricamento nota…</p>
+  </div>
+  } @else if(!note()) {
+  <div class="flex flex-col items-center justify-center text-center gap-1 py-10 h-full">
+    <div
+      class="h-16 w-16 rounded-2xl border inline-flex items-center justify-center bg-primary/10 text-primary border-primary"
+    >
+      <i class="bi bi-journal-x text-3xl" aria-hidden="true"></i>
+      <span class="sr-only">Nota non trovata</span>
+    </div>
+    <h2 class="text-lg font-medium">Nota non trovata</h2>
+    <a class="notivo-btn-primary notivo-focus" routerLink="/notes">Torna alle note</a>
+  </div>
+  } @else {
+
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between gap-2">
+      <h1 class="text-2xl font-semibold">{{ note()!.title }}</h1>
+      <div class="flex items-center gap-2 text-sm text-dark">
+        @if(getShareBadge(note()); as badge) {
+        <notivo-tooltip [text]="badge.label">
+          <span
+            class="h-7 w-7 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1"
+            [ngClass]="badge.colorClass"
+            [attr.aria-label]="badge.label"
+          >
+            <i [class]="badge.icon" aria-hidden="true"></i>
+            <span class="sr-only">{{ badge.label }}</span>
+          </span>
+        </notivo-tooltip>
+        }
+        <span>{{ note()!.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6 justify-between">
+      @if(note()!.tags && note()!.tags!.length > 0) {
+      <div class="flex items-center gap-2 mt-2 flex-wrap">
+        @for(tag of note()!.tags; track tag) {
+        <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">
+          {{ tag }}
+        </span>
+        }
+      </div>
+      } @if(note()!.sharedWith && note()!.sharedWith!.length > 0) {
+      <div class="flex items-center gap-2 mt-2 flex-wrap">
+        @for(sharedWith of note()!.sharedWith; track sharedWith) {
+        <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize text-xs">
+          {{ sharedWith }}
+        </span>
+        }
+      </div>
+      }
+    </div>
+    <div class="rounded-xl p-0 overflow-hidden">
+      <div [innerHTML]="note()!.body"></div>
+    </div>
+
+    @if(canDelete(note())) {
+    <div class="fixed right-6 bottom-6 flex items-center gap-2">
+      <a class="notivo-btn-secondary notivo-focus" [routerLink]="['/notes', 'edit', note()!.id]">
+        <i class="bi bi-pencil" aria-hidden="true"></i>
+        <span class="ml-1">Modifica</span>
+      </a>
+      <button class="notivo-btn-danger notivo-focus" type="button" (click)="deleteNote()">
+        <i class="bi bi-trash" aria-hidden="true"></i>
+        <span class="ml-1">Elimina</span>
+      </button>
+    </div>
+    }
+  </div>
+  }
+</div>

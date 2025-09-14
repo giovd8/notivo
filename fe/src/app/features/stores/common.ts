@@ -1,5 +1,12 @@
 import { computed, inject } from '@angular/core';
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { finalize, forkJoin, share, tap } from 'rxjs';
 import { NotivoResponse } from '../../core/models';
 import { Common as CommonService } from '../../services/common';
@@ -64,6 +71,13 @@ export const CommonStore = signalStore(
           finalize(() => patchState(store, { loading: false })),
           share()
         );
+      },
+    };
+  }),
+  withHooks((store) => {
+    return {
+      onInit: () => {
+        store.loadAll().subscribe();
       },
     };
   })

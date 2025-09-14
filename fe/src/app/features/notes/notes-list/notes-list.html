@@ -25,36 +25,37 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
     @for(note of notes(); track note.id) {
-    <div class="notivo-card flex flex-col gap-1">
+    <div
+      class="notivo-card flex flex-col gap-1 cursor-pointer"
+      (click)="openDetails(note.id)"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="'Apri nota ' + note.title"
+    >
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 text-sm text-dark">
           <span>{{ note.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
         </div>
 
         <div class="flex items-center gap-2">
-          @if(canDelete(note)) {
-          <div class="shrink-0">
-            <notivo-tooltip [text]="'Elimina nota'">
-              <span
-                class="h-6.5 w-6.5 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1 bg-red-100 text-red-700 border-red-300"
-                [attr.aria-label]="'Elimina nota'"
-              >
-                <i class="bi bi-trash" aria-hidden="true"></i>
-                <span class="sr-only">Elimina nota</span>
-              </span>
-            </notivo-tooltip>
-          </div>
-          } @if(getShareBadge(note); as badge) {
+          @if(getShareBadge(note); as badge) {
           <notivo-tooltip [text]="badge.label">
-            <div class="shrink-0">
+            <div class="shrink-0 relative">
               <span
-                class="h-6.5 w-6.5 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1"
+                class="h-7 w-7 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1"
                 [ngClass]="badge.colorClass"
                 [attr.aria-label]="badge.label"
               >
                 <i [class]="badge.icon" aria-hidden="true"></i>
                 <span class="sr-only">{{ badge.label }}</span>
               </span>
+              @if(note.sharedWith && note.sharedWith.length > 0) {
+              <div
+                class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-white border border-primary text-primary inline-flex items-center justify-center text-xs"
+              >
+                {{ note.sharedWith.length + 1 }}
+              </div>
+              }
             </div>
           </notivo-tooltip>
           }
@@ -68,9 +69,11 @@
       </div>
 
       @if(note.tags && note.tags.length > 0) {
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 mt-4 flex-wrap">
         @for(tag of note.tags; track tag) {
-        <span class="px-2 py-1 rounded-fullbg-primary/30 text-primary">{{ tag }}</span>
+        <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">{{
+          tag
+        }}</span>
         }
       </div>
       }

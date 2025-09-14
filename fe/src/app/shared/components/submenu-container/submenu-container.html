@@ -31,11 +31,11 @@
         (escapePressed)="onClose.emit()"
       >
         @if (isLoading()) {
-        <div class="m-1 px-8 py-2 rounded-xl flex justify-center">
-          <i class="bi bi-spinner-fill animate-spin"></i>
+        <div class="px-8 py-2 flex justify-center">
+          <notivo-spinner [size]="'w-4 h-4'" />
         </div>
         } @else { @if (showSearchBar() && isMultiselect()) {
-        <div class="p-2 z-[100] sticky top-0">
+        <div class="p-2 z-[100] sticky -top-0.5 bg-white">
           <notivo-search-bar (searchStringChange)="query.set($event)"></notivo-search-bar>
         </div>
         } @for (option of optionsFiltered(); let i = $index; track i) {

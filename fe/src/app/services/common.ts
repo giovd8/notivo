@@ -11,7 +11,9 @@ export class Common {
   private readonly http = inject(HttpClient);
 
   getTags(): Observable<NotivoResponse<LabelValue[]>> {
-    return this.http.get<NotivoResponse<LabelValue[]>>(`/api/tags`, { withCredentials: true });
+    return this.http.get<NotivoResponse<LabelValue[]>>(`/api/notes/tags`, {
+      withCredentials: true,
+    });
   }
 
   getUsers(): Observable<NotivoResponse<LabelValue[]>> {

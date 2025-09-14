@@ -27,6 +27,7 @@ const login = async (req: Request<{}, {}, UserCredentialDTO>, res: Response<Noti
     }
     const tokens = await authService.loginUser(username, password);
     const user = await findUserByUsername(username);
+    console.log('user', user);
     if (!user) {
       throw new ServerError("Invalid credentials", 401);
     }

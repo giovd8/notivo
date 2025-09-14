@@ -14,6 +14,13 @@ export interface CreateNoteEntity {
   tags: string[];
 }
 
+export interface UpdateNoteEntity {
+  title?: string;
+  body?: string;
+  sharedWith?: string[];
+  tags?: string[];
+}
+
 
 export type ListFilter = "all" | "shared";
 
@@ -22,6 +29,8 @@ export interface NoteDTO {
   title: string;
   body: string;
   ownerId: string;
+  sharedWith: string[];
+  tags: string[];
   createdAt: Date;
   updatedAt: Date;
 }

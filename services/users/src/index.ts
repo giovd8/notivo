@@ -12,7 +12,7 @@ export const createApp = () => {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use("/users", userRoutes);
+  app.use("/", userRoutes);
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const message = err?.message ? err.message : 'Internal server error';
     const status = err?.status ? err.status : 500;

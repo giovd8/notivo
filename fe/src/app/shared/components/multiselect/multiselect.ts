@@ -20,11 +20,11 @@ import { SubmenuContainer } from '../submenu-container/submenu-container';
 export class Multiselect {
   // inputs and outputs
   showOptions = signal<boolean>(false);
-  disabled = input<boolean>(false);
   placeholder = input<string>('Seleziona una o più opzioni');
   showSearchBar = input<boolean>(true);
   options = model.required<LabelValue[]>();
   selectedOptions = input<LabelValue[]>();
+  isLoading = input<boolean>(false);
   onOptionsSelectedChange = output<string[]>();
 
   // internals
@@ -99,7 +99,6 @@ export class Multiselect {
   }
 
   open(event?: KeyboardEvent): void {
-    if (this.disabled()) return;
     if (event) {
       // Prevent default for keys that would scroll or click the page
       if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'ArrowDown') {

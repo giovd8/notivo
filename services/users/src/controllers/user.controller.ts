@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
 import { NotivoResponse } from '../models/response';
 import { UserDTO } from '../models/user';
+import { LabelValue } from '../models/utils';
 import repo from '../repositories/user.repository';
 import { ServerError } from '../utils/server-error';
 
-const list = async (_req: Request, res: Response<NotivoResponse<UserDTO[]>>) => {
+const list = async (req: Request, res: Response<NotivoResponse<LabelValue[]>>) => {
   try {
-    const users = await repo.listUsers();
-    return res.status(200).json({ message: 'Users list', data: users.map(repo.toUserDTO) });
+    const requesterId = String(req.headers['x-user-id'] || '');
+    if (!requesterId) throw new ServerError('Unauthorized', 401);
+    const others = await repo.listUsersFromCache(requesterId);
+    const labelValues = (others ?? []).map((u) => repo.toLabelValueFromCached(u));
+    return res.status(200).json({ message: 'Users list', data: labelValues ?? [] });
   } catch (err: any) {
     throw new ServerError(err?.message, err?.status);
   }

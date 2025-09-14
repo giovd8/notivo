@@ -18,7 +18,7 @@ const registerUser = async (payload: UserCredentialDTO): Promise<UserDTO> => {
   const passwordHash = await bcrypt.hash(payload.password, 10);
   // call users service to create user
   const baseUrl = getBaseUrl();
-  const resp = await fetch(`${baseUrl}/users`, {
+  const resp = await fetch(`${baseUrl}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ username: payload.username })

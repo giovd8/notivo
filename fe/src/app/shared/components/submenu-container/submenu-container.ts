@@ -12,10 +12,11 @@ import {
 import { FocusHandler } from '../../directives/focus-handler';
 import { LabelValue, LabelValueCheck } from '../../models/utils';
 import { SearchBar } from '../search-bar/search-bar';
+import { Spinner } from '../spinner/spinner';
 
 @Component({
   selector: 'notivo-submenu-container',
-  imports: [CdkConnectedOverlay, SearchBar, FocusHandler],
+  imports: [CdkConnectedOverlay, SearchBar, FocusHandler, Spinner],
   templateUrl: './submenu-container.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,

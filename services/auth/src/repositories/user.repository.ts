@@ -7,7 +7,7 @@ const getBaseUrl = () => {
 
 export const findUserById = async (id: string): Promise<UserEntity | null> => {
   const baseUrl = getBaseUrl();
-  const resp = await fetch(`${baseUrl}/users/${id}`);
+  const resp = await fetch(`${baseUrl}/${id}`);
   if (!resp.ok) return null;
   const json = await resp.json();
   const user = json?.data as { id: string; username: string; createdAt: string } | null;
@@ -23,7 +23,7 @@ export const findUserById = async (id: string): Promise<UserEntity | null> => {
 
 export const findUserByUsername = async (username: string): Promise<UserEntity | null> => {
   const baseUrl = getBaseUrl();
-  const resp = await fetch(`${baseUrl}/users/search/by-username?username=${encodeURIComponent(username)}`);
+  const resp = await fetch(`${baseUrl}/search/by-username?username=${encodeURIComponent(username)}`);
   if (!resp.ok) return null;
   const json = await resp.json();
   const user = json?.data as { id: string; username: string; createdAt: string } | null;

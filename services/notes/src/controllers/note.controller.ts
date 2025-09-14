@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateNoteEntity, NoteDTO } from "../models/note";
+import { CreateNoteEntity, NoteDTO, UpdateNoteEntity } from "../models/note";
 import { NotivoResponse } from "../models/response";
 import noteRepository from "../repositories/note.repository";
 import { ServerError } from "../utils/server-error";
@@ -35,7 +35,7 @@ const listNotes = async (
 };
 
 const updateNote = async (
-  req: Request<{ id: string }, {}, CreateNoteEntity>,
+  req: Request<{ id: string }, {}, UpdateNoteEntity>,
   res: Response<NotivoResponse<NoteDTO | null>>
 ) => {
   try {
@@ -44,8 +44,8 @@ const updateNote = async (
     const { id } = req.params;
     if (!id) throw new ServerError("Note ID is required", 400)
     const { title, body, sharedWith, tags } = req.body || {};
-    if (!title || !body)  throw new ServerError("Title and body are required", 400)
-    const noteData: CreateNoteEntity = { title, body, sharedWith, tags };
+    if (!title && !body && !Array.isArray(sharedWith) && !Array.isArray(tags))  throw new ServerError("Nothing to update", 400)
+    const noteData: UpdateNoteEntity = { title, body, sharedWith, tags };
     const updated = await noteRepository.updateNote(userId, id, noteData);
     if (!updated)  throw new ServerError("Note not found", 404)
     return res.status(200).json({ message: "Note updated", data: updated });

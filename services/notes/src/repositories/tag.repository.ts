@@ -1,6 +1,7 @@
 import { getDbPool } from "../configs/postgres";
 import { TagEntity } from "../models/tag";
 import TagsCacheModel from "../models/tags-cache";
+import { LabelValue } from "../models/utils";
 
 const upsertTags = async (names: string[]): Promise<TagEntity[]> => {
   const pool = getDbPool();
@@ -48,6 +49,11 @@ const listTags = async (): Promise<TagEntity[]> => {
   return cache.tags as unknown as TagEntity[];
 };
 
-export default { upsertTags, listTags };
+const toLabelValueDto = (tag: TagEntity): LabelValue => ({
+  label: tag.name,
+  value: tag.id,
+});
+
+export default { upsertTags, listTags, toLabelValueDto };
 
 

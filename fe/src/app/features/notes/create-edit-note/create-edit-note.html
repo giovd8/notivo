@@ -23,43 +23,26 @@
       </div>
 
       <div class="mb-4">
-        <label for="body-editor" class="block text-sm font-medium mb-1">Contenuto *</label>
-        <div #quillEditor id="quill-container" class="w-full !h-[40vh]"></div>
-        <input type="hidden" formControlName="body" />
-      </div>
-
-      <div class="mb-4">
         <label for="sharedWith" class="block text-sm font-medium mb-1">Condividi</label>
         <notivo-multiselect
-          [options]="[
-            { label: 'test', value: 'testvalue' },
-            { label: 'test2', value: 'test2value' },
-            { label: 'test3', value: 'test3value' }
-          ]"
-          [selectedOptions]="[{ label: 'test', value: 'testvalue' }]"
+          [options]="userOptions()"
           (onOptionsSelectedChange)="onSharedWithSelectedChange($event)"
         />
-        <!-- <input
-          id="sharedWith"
-          type="text"
-          formControlName="sharedWith"
-          class="w-full notivo-input"
-          placeholder="Inserisci username"
-        /> -->
       </div>
 
       <div class="mb-6">
         <label for="tags" class="block text-sm font-medium mb-1">Tag</label>
         <notivo-multiselect
-          [options]="[
-            { label: 'test', value: 'testvalue' },
-            { label: 'test2', value: 'test2value' },
-            { label: 'test3', value: 'test3value' }
-          ]"
+          [options]="tagOtions()"
           placeholder="Seleziona tag"
-          [selectedOptions]="[{ label: 'test', value: 'test' }]"
-          (onOptionsSelectedChange)="onSharedWithSelectedChange($event)"
+          (onOptionsSelectedChange)="onTagsSelectedChange($event)"
         />
+      </div>
+
+      <div class="mb-4">
+        <label for="body-editor" class="block text-sm font-medium mb-1">Contenuto *</label>
+        <div #quillEditor id="quill-container" class="w-full !h-[40vh]"></div>
+        <input type="hidden" formControlName="body" />
       </div>
 
       <div class="flex justify-end gap-3">

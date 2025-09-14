@@ -1,9 +1,8 @@
 <button
   #button
   type="button"
-  (click)="!disabled() ? showOptions.set(true) : null"
+  (click)="showOptions.set(true)"
   class="w-full flex items-center relative disabled:opacity-50"
-  [disabled]="disabled()"
   [attr.id]="buttonId"
   aria-haspopup="listbox"
   [attr.aria-expanded]="showOptions() ? 'true' : 'false'"
@@ -15,7 +14,7 @@
 >
   <div class="notivo-input flex gap-2 w-full !cursor-pointer">
     @if (!!getSelectedOptions()) {
-    <p class="truncate">{{ getSelectedOptions() }}</p>
+    <p class="truncate capitalize">{{ getSelectedOptions() }}</p>
     } @else {
     <p class="text-gray-400">{{ placeholder() }}</p>
     }
@@ -29,6 +28,7 @@
   [origin]="button"
   [listId]="listboxId"
   [labelledById]="buttonId"
+  [isLoading]="isLoading()"
   (onClose)="showOptions.set(false)"
   (onOptionSelected)="setOption($event)"
 />

@@ -1,12 +1,12 @@
 import { SidenavItem } from './models';
 
 export const sidenavItems: SidenavItem[] = [
-  {
-    title: 'Home',
-    icon: 'bi bi-house',
-    route: '/home',
-    spacing: false,
-  },
+  // {
+  //   title: 'Home',
+  //   icon: 'bi bi-house',
+  //   route: '/home',
+  //   spacing: false,
+  // },
   {
     title: 'Note',
     icon: 'bi bi-file-earmark-text',
