@@ -18,10 +18,11 @@ import Quill from 'quill';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
 import { ApiService } from '../../../services/api';
+import { Multiselect } from '../../../shared/components/multiselect/multiselect';
 
 @Component({
   selector: 'notivo-create-edit-note',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Multiselect],
   templateUrl: './create-edit-note.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -148,5 +149,10 @@ export class CreateEditNote {
         },
         complete: () => this.submitting.set(false),
       });
+  }
+
+  onSharedWithSelectedChange(users: string[]) {
+    console.log('onSharedWithSelectedChange', users);
+    console.log(users);
   }
 }

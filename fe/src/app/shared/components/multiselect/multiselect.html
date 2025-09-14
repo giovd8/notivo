@@ -1,0 +1,23 @@
+<button
+  #button
+  (click)="!disabled() ? showOptions.set(true) : null"
+  class="w-full flex items-center relative disabled:opacity-50"
+  [disabled]="disabled()"
+>
+  <div class="notivo-input flex gap-2 w-full !cursor-pointer">
+    @if (!!getSelectedOptions()) {
+    <p class="truncate">{{ getSelectedOptions() }}</p>
+    } @else {
+    <p class="text-gray-400">{{ placeholder() }}</p>
+    }
+  </div>
+</button>
+@if (showOptions()) {
+<notivo-submenu-container
+  [isMultiselect]="true"
+  [showSearchBar]="showSearchBar()"
+  [options]="optionsRef()"
+  (onClose)="showOptions.set(false)"
+  (onOptionSelected)="setOption($event)"
+/>
+}

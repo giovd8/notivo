@@ -11,20 +11,6 @@ import { User } from '../shared/models/user';
 export class ApiService {
   private readonly http = inject(HttpClient);
 
-  test() {
-    return this.http.get(`/api/healthz`).subscribe({
-      next: (res) => {
-        console.log(res);
-      },
-      error: (err) => {
-        console.error(err);
-      },
-      complete: () => {
-        console.log('completed');
-      },
-    });
-  }
-
   createNote(payload: NotePayload): Observable<NotivoResponse<Note>> {
     return this.http.post<NotivoResponse<Note>>(`/api/notes`, payload, {
       withCredentials: true,

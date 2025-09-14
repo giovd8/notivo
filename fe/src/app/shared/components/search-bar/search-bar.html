@@ -1,0 +1,17 @@
+<div class="flex items-center relative">
+  <i class="bi bi-search absolute left-4"></i>
+  <!-- (keyup)="setSearchString($event)" -->
+  <input
+    [formControl]="searchStringFormControl"
+    [style.padding-left]="'2.5rem'"
+    [style.padding-right]="'2.5rem'"
+    [placeholder]="placeholder()"
+    class="notivo-input min-w-[250px] w-full"
+    type="text"
+  />
+  @if (searchStringFormControl.value?.length) {
+  <button (click)="clear($event)" class="absolute right-4">
+    <i class="bi bi-x-lg"></i>
+  </button>
+  }
+</div>
