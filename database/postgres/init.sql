@@ -6,6 +6,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username VARCHAR(50) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ================================
+-- TABELLA ACCOUNTS
+-- ================================
+CREATE TABLE IF NOT EXISTS accounts (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   password_hash TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
@@ -36,8 +44,13 @@ CREATE TABLE IF NOT EXISTS notes_shared (
 -- ================================
 CREATE TABLE IF NOT EXISTS tags (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR(50) UNIQUE NOT NULL
+  name VARCHAR(50) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Safe alter for existing databases
+ALTER TABLE IF EXISTS tags
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW();
 
 -- ================================
 -- TABELLA NOTES_TAGS
@@ -47,3 +60,4 @@ CREATE TABLE IF NOT EXISTS notes_tags (
   tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
   PRIMARY KEY (note_id, tag_id)
 );
+

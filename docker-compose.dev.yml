@@ -1,14 +1,14 @@
 services:
   frontend:
     build:
-      context: ./fe
+      context: ./frontend
       dockerfile: Dockerfile.dev
     command: npm run start -- --host 0.0.0.0 --port 4200 --poll 2000
     environment:
       CHOKIDAR_USEPOLLING: "1"
       WATCHPACK_POLLING: "true"
     volumes:
-      - ./fe:/app
+      - ./frontend:/app
       - /app/node_modules
   gateway:
     build:
@@ -17,9 +17,17 @@ services:
     volumes:
       - ./gateway:/app
       - /app/node_modules
+    environment:
+      NODE_ENV: development
+      JWT_ACCESS_SECRET: dev-access-secret
+      AUTH_SERVICE_URL: http://auth-service:3001
+      USERS_SERVICE_URL: http://users-service:3002
+      NOTES_SERVICE_URL: http://notes-service:3003
+      CORS_ORIGIN: https://localhost
     depends_on:
       - auth-service
-      - note-service
+      - users-service
+      - notes-service
   auth-service:
     build:
       context: ./services/auth
@@ -28,6 +36,10 @@ services:
       - ./services/auth:/app
       - /app/node_modules
     environment:
+      NODE_ENV: development
+      JWT_ACCESS_SECRET: dev-access-secret
+      JWT_REFRESH_SECRET: dev-refresh-secret
+      USERS_SERVICE_URL: http://users-service:3002
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: user
@@ -40,13 +52,37 @@ services:
       MONGO_PASSWORD: pass
       MONGO_DB: notivo
       MONGO_AUTH_SOURCE: admin
-
-  note-service:
+    depends_on:
+      - postgres
+      - mongo
+  users-service:
     build:
-      context: ./services/note
+      context: ./services/users
       dockerfile: Dockerfile.dev
     volumes:
-      - ./services/note:/app
+      - ./services/users:/app
+      - /app/node_modules
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: notivo
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_USER: user
+      MONGO_PASSWORD: pass
+      MONGO_DB: notivo
+      MONGO_AUTH_SOURCE: admin
+    depends_on:
+      - postgres
+      - mongo
+  notes-service:
+    build:
+      context: ./services/notes
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/notes:/app
       - /app/node_modules
     environment:
       POSTGRES_HOST: postgres
@@ -61,7 +97,10 @@ services:
       MONGO_PASSWORD: pass
       MONGO_DB: notivo
       MONGO_AUTH_SOURCE: admin
-
+    depends_on:
+      - postgres
+      - mongo
+    
   postgres:
     image: postgres:15
     environment:

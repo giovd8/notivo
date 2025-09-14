@@ -1,0 +1,102 @@
+<div class="h-full w-full p-4 flex flex-col gap-4">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold">Le tue note</h1>
+    <a class="notivo-btn-primary notivo-focus" routerLink="/notes/add"> Aggiungi nota </a>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <notivo-search-bar
+      [value]="searchText()"
+      placeholder="Cerca nelle note"
+      (searchStringChange)="onSearchTextChange($event)"
+    />
+    <notivo-multiselect
+      [options]="commonStore.tagOptions()"
+      [isLoading]="commonStore.loading()"
+      placeholder="Filtra per tag"
+      (onOptionsSelectedChange)="onTagsChange($event)"
+    />
+    <button class="notivo-btn-outline-primary" type="button" (click)="noteStore.clearFilters()">
+      Pulisci filtri
+    </button>
+  </div>
+  @if(isLoading()) {
+  <div class="flex flex-col items-center justify-center text-center gap-2 py-10 h-full">
+    <notivo-spinner />
+    <!-- <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div> -->
+    <p class="text-dark">Caricamento note in corso…</p>
+  </div>
+  } @else if(notes().length === 0) {
+  <div class="flex flex-col items-center justify-center text-center gap-1 py-10 h-full">
+    <div
+      class="h-16 w-16 rounded-2xl border inline-flex items-center justify-center bg-primary/10 text-primary border-primary"
+    >
+      <i class="bi bi-journal-x text-3xl" aria-hidden="true"></i>
+      <span class="sr-only">Nessuna nota disponibile</span>
+    </div>
+    <h2 class="text-lg font-medium">Nessuna nota</h2>
+    <p class="text-dark">Non ci sono note disponibili.</p>
+    <p class="text-dark">Aggiungi una nota tramite il pulsante "Aggiungi nota" in alto a destra.</p>
+  </div>
+  } @else {
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    @for(note of notes(); track note.id) {
+    <div
+      class="notivo-card flex flex-col gap-1 cursor-pointer"
+      (click)="openDetails(note.id)"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="'Apri nota ' + note.title"
+    >
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 text-sm text-dark">
+          <span>{{ note.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          @if(getShareBadge(note); as badge) {
+          <notivo-tooltip [text]="badge.label">
+            <div class="shrink-0 relative">
+              <span
+                class="h-7 w-7 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1"
+                [ngClass]="badge.colorClass"
+                [attr.aria-label]="badge.label"
+              >
+                <i [class]="badge.icon" aria-hidden="true"></i>
+                <span class="sr-only">{{ badge.label }}</span>
+              </span>
+              @if(note.sharedWith && note.sharedWith.length > 0) {
+              <div
+                class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-white border border-primary text-primary inline-flex items-center justify-center text-xs"
+              >
+                {{ note.sharedWith.length + 1 }}
+              </div>
+              }
+            </div>
+          </notivo-tooltip>
+          }
+        </div>
+      </div>
+
+      <h2 class="text-lg font-medium truncate" [title]="note.title">{{ note.title }}</h2>
+
+      <div class="rounded-xl p-0 max-h-[300px] overflow-hidden">
+        <div class="clamp-10 text-sm inner-a" [innerHTML]="note.body"></div>
+      </div>
+
+      <div class="flex-1"></div>
+      @if(note.tags && note.tags.length > 0) {
+      <div class="flex items-center gap-2 mt-4 flex-wrap">
+        @for(tag of note.tags; track tag.value) {
+        <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">{{
+          tag.label
+        }}</span>
+        }
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+</div>

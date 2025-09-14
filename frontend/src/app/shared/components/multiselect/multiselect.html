@@ -1,0 +1,35 @@
+<button
+  #button
+  type="button"
+  (click)="showOptions.set(true)"
+  class="min-w-[250px] w-full flex items-center relative disabled:opacity-50"
+  [attr.id]="buttonId"
+  aria-haspopup="listbox"
+  [attr.aria-expanded]="showOptions() ? 'true' : 'false'"
+  [attr.aria-controls]="showOptions() ? listboxId : null"
+  [attr.aria-label]="placeholder()"
+  (keydown.enter)="openFromKey($event)"
+  (keydown.space)="openFromKey($event)"
+  (keydown.arrowdown)="openFromKey($event)"
+>
+  <div class="notivo-input flex gap-2 w-full !cursor-pointer">
+    @if (!!getSelectedOptions()) {
+    <p class="truncate capitalize">{{ getSelectedOptions() }}</p>
+    } @else {
+    <p class="text-gray-400">{{ placeholder() }}</p>
+    }
+  </div>
+</button>
+@if (showOptions()) {
+<notivo-submenu-container
+  [isMultiselect]="true"
+  [showSearchBar]="showSearchBar()"
+  [options]="optionsRef()"
+  [origin]="button"
+  [listId]="listboxId"
+  [labelledById]="buttonId"
+  [isLoading]="isLoading()"
+  (onClose)="showOptions.set(false)"
+  (onOptionSelected)="setOption($event)"
+/>
+}
