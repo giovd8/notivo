@@ -1,15 +1,47 @@
 import { getDbPool } from "../configs/postgres";
 import { CreateNoteEntity, NoteDTO, NoteEntity } from "../models/note";
+import UserNotesCacheModel from "../models/user-notes-cache";
 
 export const createNote = async (ownerId: string, input: CreateNoteEntity): Promise<NoteEntity> => {
   const pool = getDbPool();
-  const result = await pool.query(
-    `INSERT INTO notes (title, body, owner_id)
-     VALUES ($1, $2, $3)
-     RETURNING id, title, body, owner_id as "ownerId", created_at as "createdAt", updated_at as "updatedAt"`,
-    [input.title, input.body, ownerId]
-  );
-  return result.rows[0] as NoteEntity;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await client.query(
+      `INSERT INTO notes (title, body, owner_id)
+       VALUES ($1, $2, $3)
+       RETURNING id, title, body, owner_id as "ownerId", created_at as "createdAt", updated_at as "updatedAt"`,
+      [input.title, input.body, ownerId]
+    );
+    const created = result.rows[0] as NoteEntity;
+    const noteId = created.id;
+    const sharedWith = Array.isArray(input.sharedWith) ? input.sharedWith : [];
+    if (sharedWith.length > 0) {
+      const values = sharedWith.map((_, i) => `($1, $${i + 2})`).join(', ');
+      await client.query(
+        `INSERT INTO notes_shared (note_id, user_id) VALUES ${values} ON CONFLICT DO NOTHING`,
+        [noteId, ...sharedWith]
+      );
+    }
+    await client.query('COMMIT');
+    await UserNotesCacheModel.updateOne(
+      { userId: ownerId },
+      { $push: { notes: created }, $set: { updatedAt: new Date() } },
+      { upsert: true }
+    );
+    if (sharedWith.length > 0) {
+      await UserNotesCacheModel.updateMany(
+        { userId: { $in: sharedWith } },
+        { $push: { notes: created }, $set: { updatedAt: new Date() } }
+      );
+    }
+    return created;
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 };
 
 export const toNoteDTO = (note: NoteEntity): NoteDTO => ({
@@ -55,8 +87,35 @@ export const updateNote = async (userId: string, noteId: string, input: CreateNo
 
 export const deleteNote = async (userId: string, noteId: string): Promise<boolean> => {
   const pool = getDbPool();
-  const result = await pool.query(`DELETE FROM notes WHERE id = $1 AND owner_id = $2`, [noteId, userId]);
-  return (result.rowCount ?? 0) > 0;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await client.query(`DELETE FROM notes WHERE id = $1 AND owner_id = $2`, [noteId, userId]);
+    if ((result.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    const sharedWithRes = await client.query<{ user_id: string }>(`SELECT user_id FROM notes_shared WHERE note_id = $1`, [noteId]);
+    await client.query(`DELETE FROM notes_shared WHERE note_id = $1`, [noteId]);
+    await client.query('COMMIT');
+    await UserNotesCacheModel.updateOne(
+      { userId },
+      { $pull: { notes: { id: noteId } }, $set: { updatedAt: new Date() } }
+    );
+    const sharedWith = sharedWithRes.rows.map(r => r.user_id);
+    if (sharedWith.length > 0) {
+      await UserNotesCacheModel.updateMany(
+        { userId: { $in: sharedWith } },
+        { $pull: { notes: { id: noteId } }, $set: { updatedAt: new Date() } }
+      );
+    }
+    return true;
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 };
 
 export default { createNote, toNoteDTO, listNotes, updateNote, deleteNote };

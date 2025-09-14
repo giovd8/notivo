@@ -1,4 +1,4 @@
-db = db.getSiblingDB("user_cache");
+db = db.getSiblingDB("notivo");
 
 db.createCollection("sessions");
 db.sessions.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
@@ -28,3 +28,36 @@ db.note_cache.insertOne({
   sharedWith: ["test-2", "test-3"],
   indexedAt: new Date(),
 });
+
+db.createCollection("users_cache");
+db.users_cache.createIndex({ userId: 1 }, { unique: true });
+db.users_cache.createIndex({ updatedAt: 1 });
+db.users_cache.insertMany([
+  { userId: "test-1", others: [
+    { id: "test-2", username: "user2", createdAt: new Date() },
+    { id: "test-3", username: "user3", createdAt: new Date() }
+  ], updatedAt: new Date() },
+  { userId: "test-2", others: [
+    { id: "test-1", username: "user1", createdAt: new Date() },
+    { id: "test-3", username: "user3", createdAt: new Date() }
+  ], updatedAt: new Date() },
+  { userId: "test-3", others: [
+    { id: "test-1", username: "user1", createdAt: new Date() },
+    { id: "test-2", username: "user2", createdAt: new Date() }
+  ], updatedAt: new Date() },
+]);
+
+db.createCollection("user_notes_cache");
+db.user_notes_cache.createIndex({ userId: 1 }, { unique: true });
+db.user_notes_cache.createIndex({ updatedAt: 1 });
+db.user_notes_cache.insertMany([
+  { userId: "test-1", notes: [
+    { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
+  ], updatedAt: new Date() },
+  { userId: "test-2", notes: [
+    { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
+  ], updatedAt: new Date() },
+  { userId: "test-3", notes: [
+    { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
+  ], updatedAt: new Date() },
+]);

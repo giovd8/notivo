@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import dotenv from 'dotenv';
 import express from "express";
 import http from "http";
+import { closeMongo, initMongo } from "./configs/mongo";
 import { getDbPool, initPostgres } from "./configs/postgres";
 import userRoutes from "./routes/user.routes";
 
@@ -17,6 +18,7 @@ export const createApp = () => {
 
 const start = async () => {
   await initPostgres();
+  await initMongo();
   const app = createApp();
   const port = Number(process.env.PORT || 3002);
   const server = http.createServer(app);
@@ -27,6 +29,7 @@ const start = async () => {
       try {
         const pool = getDbPool();
         await pool.end();
+        await closeMongo();
       } catch (e) {
         // noop
       } finally {

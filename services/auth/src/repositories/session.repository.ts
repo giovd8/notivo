@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { SessionDocument } from "../models/session";
 
 const getCollection = () => {
-  const conn = mongoose.connection.useDb("user_cache");
+  const conn = mongoose.connection.useDb("notivo");
   return conn.collection<SessionDocument>("sessions");
 };
 

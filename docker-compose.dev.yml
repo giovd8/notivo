@@ -68,8 +68,15 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: notivo
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_USER: user
+      MONGO_PASSWORD: pass
+      MONGO_DB: notivo
+      MONGO_AUTH_SOURCE: admin
     depends_on:
       - postgres
+      - mongo
   notes-service:
     build:
       context: ./services/notes
