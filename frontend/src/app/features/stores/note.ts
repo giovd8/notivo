@@ -56,7 +56,7 @@ export const NoteStore = signalStore(
           match = match && (inTitle || inBody);
         }
         if (hasTags) {
-          const noteTags = n.tags ?? [];
+          const noteTags = (n.tags ?? []).map((t) => t.value);
           // Match notes that contain ALL selected tags
           match = match && selectedTags.every((t) => noteTags.includes(t));
         }

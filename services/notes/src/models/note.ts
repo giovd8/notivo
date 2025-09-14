@@ -29,8 +29,8 @@ export interface NoteDTO {
   title: string;
   body: string;
   ownerId: string;
-  sharedWith: string[];
-  tags: string[];
+  sharedWith: import("./utils").LabelValue<string>[];
+  tags: import("./utils").LabelValue<string>[];
   createdAt: Date;
   updatedAt: Date;
 }

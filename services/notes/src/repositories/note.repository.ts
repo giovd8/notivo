@@ -1,6 +1,8 @@
 import { getDbPool } from "../configs/postgres";
 import { CreateNoteEntity, NoteDTO, NoteEntity, UpdateNoteEntity } from "../models/note";
 import UserNotesCacheModel, { CachedNote, CachedSharedUser, CachedTag } from "../models/user-notes-cache";
+import { LabelValue } from "../models/utils";
+import { ServerError } from "../utils/server-error";
 
 const createNote = async (ownerId: string, input: CreateNoteEntity): Promise<NoteDTO> => {
   const pool = getDbPool();
@@ -75,8 +77,8 @@ const createNote = async (ownerId: string, input: CreateNoteEntity): Promise<Not
       title: created.title,
       body: created.body,
       ownerId: created.ownerId,
-      sharedWith: cachedUsers.map((u) => u.id),
-      tags: cachedTags.map((t) => t.id),
+      sharedWith: cachedUsers.map((u) => ({ label: u.username, value: u.id })) as LabelValue<string>[],
+      tags: cachedTags.map((t) => ({ label: t.name, value: t.id })) as LabelValue<string>[],
       createdAt: created.createdAt,
       updatedAt: created.updatedAt,
     } as NoteDTO;
@@ -96,8 +98,8 @@ const listNotes = async (userId: string,): Promise<NoteDTO[]> => {
     title: n.title,
     body: n.body,
     ownerId: n.ownerId,
-    sharedWith: (n.sharedWith || []).map((u: any) => String(u.username)),
-    tags: (n.tags || []).map((t: any) => String(t.name)),
+    sharedWith: (n.sharedWith || []).map((u: any) => ({ label: String(u.username), value: String(u.id) })) as LabelValue<string>[],
+    tags: (n.tags || []).map((t: any) => ({ label: String(t.name), value: String(t.id) })) as LabelValue<string>[],
     createdAt: n.createdAt,
     updatedAt: n.updatedAt,
   } as NoteDTO));
@@ -108,6 +110,19 @@ const updateNote = async (userId: string, noteId: string, input: UpdateNoteEntit
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    const ownerCheckRes = await client.query<{ owner_id: string }>(
+      `SELECT owner_id FROM notes WHERE id = $1`,
+      [noteId]
+    );
+    if ((ownerCheckRes.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    const isOwner = String(ownerCheckRes.rows[0].owner_id) === String(userId);
+    if (!isOwner) {
+      await client.query('ROLLBACK');
+      throw new ServerError('Forbidden', 403);
+    }
     const currentSharedRes = await client.query<{ user_id: string }>(
       `SELECT user_id FROM notes_shared WHERE note_id = $1`,
       [noteId]
@@ -257,8 +272,8 @@ const updateNote = async (userId: string, noteId: string, input: UpdateNoteEntit
       title: updated.title,
       body: updated.body,
       ownerId: updated.ownerId,
-      sharedWith: finalShared,
-      tags: finalTags,
+      sharedWith: cachedUsers.map((u) => ({ label: u.username, value: u.id })) as LabelValue<string>[],
+      tags: cachedTags.map((t) => ({ label: t.name, value: t.id })) as LabelValue<string>[],
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
     } as NoteDTO;
@@ -275,6 +290,19 @@ const deleteNote = async (userId: string, noteId: string): Promise<boolean> => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    const ownerCheckRes = await client.query<{ owner_id: string }>(
+      `SELECT owner_id FROM notes WHERE id = $1`,
+      [noteId]
+    );
+    if ((ownerCheckRes.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    const isOwner = String(ownerCheckRes.rows[0].owner_id) === String(userId);
+    if (!isOwner) {
+      await client.query('ROLLBACK');
+      throw new ServerError('Forbidden', 403);
+    }
     const result = await client.query(`DELETE FROM notes WHERE id = $1 AND owner_id = $2`, [noteId, userId]);
     if ((result.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');

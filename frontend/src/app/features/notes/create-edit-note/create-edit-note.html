@@ -1,6 +1,6 @@
 <main class="max-w-2xl mx-auto p-4">
   <section>
-    <h1 class="text-xl font-semibold mb-4">Crea nota</h1>
+    <h1 class="text-xl font-semibold mb-4">{{ isEditMode() ? 'Modifica nota' : 'Crea nota' }}</h1>
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate aria-describedby="note-help">
       <p id="note-help" class="text-sm text-gray-600 mb-4">
         I campi contrassegnati sono obbligatori.
@@ -26,6 +26,7 @@
         <label for="sharedWith" class="block text-sm font-medium mb-1">Condividi</label>
         <notivo-multiselect
           [options]="userOptions()"
+          [selectedOptions]="selectedUsersLV()"
           (onOptionsSelectedChange)="onSharedWithSelectedChange($event)"
         />
       </div>
@@ -34,6 +35,7 @@
         <label for="tags" class="block text-sm font-medium mb-1">Tag</label>
         <notivo-multiselect
           [options]="tagOtions()"
+          [selectedOptions]="selectedTagsLV()"
           placeholder="Seleziona tag"
           (onOptionsSelectedChange)="onTagsSelectedChange($event)"
         />
@@ -46,8 +48,8 @@
       </div>
 
       <div class="flex justify-end gap-3">
-        <button type="button" class="notivo-btn-outline-primary" (click)="form.reset()">
-          Cancella
+        <button type="button" class="notivo-btn-outline-primary" routerLink="/notes">
+          Annulla
         </button>
         <button
           type="submit"

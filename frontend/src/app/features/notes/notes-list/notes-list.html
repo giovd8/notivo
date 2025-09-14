@@ -3,6 +3,7 @@
     <h1 class="text-2xl font-semibold">Le tue note</h1>
     <a class="notivo-btn-primary notivo-focus" routerLink="/notes/add"> Aggiungi nota </a>
   </div>
+
   @if(isLoading()) {
   <div class="flex flex-col items-center justify-center text-center gap-2 py-10 h-full">
     <notivo-spinner />
@@ -65,14 +66,15 @@
       <h2 class="text-lg font-medium truncate" [title]="note.title">{{ note.title }}</h2>
 
       <div class="rounded-xl p-0 max-h-[300px] overflow-hidden">
-        <div class="clamp-10" [innerHTML]="note.body"></div>
+        <div class="clamp-10 text-sm inner-a" [innerHTML]="note.body"></div>
       </div>
 
+      <div class="flex-1"></div>
       @if(note.tags && note.tags.length > 0) {
       <div class="flex items-center gap-2 mt-4 flex-wrap">
-        @for(tag of note.tags; track tag) {
+        @for(tag of note.tags; track tag.value) {
         <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">{{
-          tag
+          tag.label
         }}</span>
         }
       </div>

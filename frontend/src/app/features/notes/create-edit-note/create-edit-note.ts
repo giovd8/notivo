@@ -14,32 +14,39 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import Quill from 'quill';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
-import { NoteService } from '../../../services/note';
 import { Multiselect } from '../../../shared/components/multiselect/multiselect';
+import { LabelValue } from '../../../shared/models/utils';
 import { CommonStore } from '../../stores/common';
+import { NoteStore } from '../../stores/note';
 
 @Component({
   selector: 'notivo-create-edit-note',
-  imports: [ReactiveFormsModule, Multiselect],
+  imports: [ReactiveFormsModule, Multiselect, RouterLink],
   templateUrl: './create-edit-note.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateEditNote {
   private readonly fb = new FormBuilder();
-  private readonly api = inject(NoteService);
+  private readonly store = inject(NoteStore);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly commonStore = inject(CommonStore);
+  private readonly noteStore = inject(NoteStore);
   readonly tagOtions = computed(() => this.commonStore.tagOptions());
   readonly userOptions = computed(() => this.commonStore.userOptions());
   readonly isLoadingDataFromStore = computed(() => this.commonStore.loading());
 
   readonly submitting = signal(false);
+  private readonly noteId = signal<string | null>(null);
+  readonly isEditMode = computed(() => !!this.noteId());
+  readonly selectedUsersLV = signal<LabelValue[]>([]);
+  readonly selectedTagsLV = signal<LabelValue[]>([]);
 
   readonly editorEl = viewChild<ElementRef<HTMLDivElement>>('quillEditor');
   private quill: Quill | null = null;
@@ -62,6 +69,44 @@ export class CreateEditNote {
     sharedWith: this.fb.nonNullable.control<string[]>([]),
     tags: this.fb.nonNullable.control<string[]>([]),
   });
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    this.noteId.set(id);
+    if (!id) return;
+    const notes = this.noteStore.notes();
+    let note = notes.find((n) => n.id === id);
+    if (note) {
+      this.patchFormFromNote(note);
+      return;
+    }
+    this.noteStore.refresh().subscribe({
+      next: () => {
+        const fresh = this.noteStore.notes().find((n) => n.id === id);
+        if (fresh) this.patchFormFromNote(fresh);
+      },
+      error: () => {},
+    });
+  }
+
+  private patchFormFromNote(note: {
+    title: string;
+    body: string;
+    sharedWith?: { value: string }[];
+    tags?: { value: string }[];
+  }): void {
+    this.form.patchValue({
+      title: note.title ?? '',
+      body: note.body ?? '',
+      sharedWith: (note.sharedWith ?? []).map((u) => u.value),
+      tags: (note.tags ?? []).map((t) => t.value),
+    });
+    this.selectedUsersLV.set((note.sharedWith ?? []).map((u) => ({ label: '', value: u.value })));
+    this.selectedTagsLV.set((note.tags ?? []).map((t) => ({ label: '', value: t.value })));
+    if (this.quill) {
+      this.quill.root.innerHTML = this.form.value.body ?? '';
+    }
+  }
 
   async ngAfterViewInit(): Promise<void> {
     const quillContainer = this.editorEl()?.nativeElement;
@@ -120,23 +165,46 @@ export class CreateEditNote {
     const sharedWith = this.form.value.sharedWith ?? [];
     const tags = this.form.value.tags ?? [];
 
-    this.api
-      .createOne({
-        title: this.form.value.title!,
-        body: this.form.value.body!,
-        sharedWith,
-        tags,
-      })
-      .subscribe({
+    const payload = {
+      title: this.form.value.title!,
+      body: this.form.value.body!,
+      sharedWith,
+      tags,
+    };
+
+    const editingId = this.noteId();
+    if (editingId) {
+      this.store.update(editingId, payload).subscribe({
+        next: () => {
+          this.toast.show({
+            message: 'Nota aggiornata con successo',
+            type: ToastType.Success,
+            seconds: 4,
+          });
+          this.router.navigate(['/notes', editingId]);
+        },
+        error: (err: any) => {
+          console.error(err);
+          this.toast.show({
+            message: "Errore nell'aggiornamento della nota",
+            type: ToastType.Error,
+            seconds: 6,
+          });
+          this.submitting.set(false);
+        },
+        complete: () => this.submitting.set(false),
+      });
+    } else {
+      this.store.create(payload).subscribe({
         next: () => {
           this.toast.show({
             message: 'Nota creata con successo',
             type: ToastType.Success,
             seconds: 4,
           });
-          this.router.navigateByUrl('/');
+          this.router.navigate(['/notes']);
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error(err);
           this.toast.show({
             message: 'Errore nella creazione della nota',
@@ -147,13 +215,16 @@ export class CreateEditNote {
         },
         complete: () => this.submitting.set(false),
       });
+    }
   }
 
   onSharedWithSelectedChange(users: string[]) {
     this.form.controls.sharedWith.setValue(users);
+    this.selectedUsersLV.set(users.map((v) => ({ label: '', value: v })));
   }
 
   onTagsSelectedChange(tags: string[]) {
     this.form.controls.tags.setValue(tags);
+    this.selectedTagsLV.set(tags.map((v) => ({ label: '', value: v })));
   }
 }
