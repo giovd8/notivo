@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { CreateNoteEntity, NoteDTO } from "../models/note";
 import { NotivoResponse } from "../models/response";
 import noteRepository from "../repositories/note.repository";
+import { ServerError } from "../utils/server-error";
 
 const createNote = async (
   req: Request<{}, {}, CreateNoteEntity>,
@@ -10,12 +11,12 @@ const createNote = async (
   try {
     const ownerId = String(req.headers["x-user-id"] || "");
     const { title, body, sharedWith, tags } = req.body || {};
-    if (!ownerId) return res.status(401).json({ message: "Unauthorized", data: null });
-    if (!title || !body) return res.status(400).json({ message: "Title and body are required", data: null });
+    if (!ownerId) throw new ServerError("Unauthorized", 401)
+    if (!title || !body) throw new ServerError("Title and body are required", 400)
     const note = await noteRepository.createNote(ownerId,{ title, body, sharedWith, tags } );
     return res.status(201).json({ message: "Note created", data: note });
-  } catch (_err) {
-    return res.status(500).json({ message: "Internal Server Error", data: null });
+  } catch (err: any) {
+    throw new ServerError(err?.message, err?.status);
   }
 };
 
@@ -25,11 +26,11 @@ const listNotes = async (
 ) => {
   try {
     const userId = String(req.headers["x-user-id"] || "");
-    if (!userId) return res.status(401).json({ message: "Unauthorized", data: [] });
+    if (!userId) throw new ServerError("Unauthorized", 401)
     const notes = await noteRepository.listNotes(userId);
     return res.status(200).json({ message: "Notes fetched", data: notes });
-  } catch (_err) {
-    return res.status(500).json({ message: "Internal Server Error", data: [] });
+  } catch (err: any) {
+    throw new ServerError(err?.message, err?.status);
   }
 };
 
@@ -39,17 +40,17 @@ const updateNote = async (
 ) => {
   try {
     const userId = String(req.headers["x-user-id"] || "");
-    if (!userId) return res.status(401).json({ message: "Unauthorized", data: null });
+    if (!userId) throw new ServerError("Unauthorized", 401)
     const { id } = req.params;
-    if (!id) return res.status(400).json({ message: "Note ID is required", data: null });
+    if (!id) throw new ServerError("Note ID is required", 400)
     const { title, body, sharedWith, tags } = req.body || {};
-    if (!title || !body) return res.status(400).json({ message: "Title and body are required", data: null });
+    if (!title || !body)  throw new ServerError("Title and body are required", 400)
     const noteData: CreateNoteEntity = { title, body, sharedWith, tags };
     const updated = await noteRepository.updateNote(userId, id, noteData);
-    if (!updated) return res.status(404).json({ message: "Note not found", data: null });
+    if (!updated)  throw new ServerError("Note not found", 404)
     return res.status(200).json({ message: "Note updated", data: updated });
-  } catch (_err) {
-    return res.status(500).json({ message: "Internal Server Error", data: null });
+  } catch (err: any) {
+    throw new ServerError(err?.message, err?.status);
   }
 };
 
@@ -59,14 +60,14 @@ const deleteNote = async (
 ) => {
   try {
     const userId = String(req.headers["x-user-id"] || "");
-    if (!userId) return res.status(401).json({ message: "Unauthorized", data: null });
+    if (!userId) throw new ServerError("Unauthorized", 401)
     const { id } = req.params;
-    if (!id) return res.status(400).json({ message: "Note ID is required", data: null });
+    if (!id) throw new ServerError("Note ID is required", 400)
     const ok = await noteRepository.deleteNote(userId, id);
-    if (!ok) return res.status(404).json({ message: "Note not found", data: null });
-    return res.status(204).send();
-  } catch (_err) {
-    return res.status(500).json({ message: "Internal Server Error", data: null });
+    if (!ok) throw new ServerError("Note not found", 404)
+    return res.status(204).json({ message: "Note deleted", data: null});
+  } catch (err: any) {
+     throw new ServerError(err?.message, err?.status);
   }
 };
 

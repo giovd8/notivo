@@ -1,6 +1,6 @@
 import cookieParser from "cookie-parser";
 import dotenv from 'dotenv';
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import http from "http";
 import { closeMongo, initMongo } from "./configs/mongo";
 import { getDbPool, initPostgres } from "./configs/postgres";
@@ -15,6 +15,13 @@ export const createApp = () => {
   app.use(cookieParser());
   app.use("/notes", noteRoutes);
   app.use("/tags", tagRoutes);
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const message = err?.message ? err.message : 'Internal server error';
+    const status = err?.status ? err.status : 500;
+    const data = err?.data ? err.data : null;
+    console.log(`Note service error - status: ${status}, message: ${message}`);
+    return res.status(status).json({ data, message });
+  });
   return app;
 };
 
