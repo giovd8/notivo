@@ -61,3 +61,15 @@ db.user_notes_cache.insertMany([
     { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
   ], updatedAt: new Date() },
 ]);
+
+db.createCollection("tags_cache");
+db.tags_cache.createIndex({ key: 1 }, { unique: true });
+db.tags_cache.createIndex({ updatedAt: 1 });
+db.tags_cache.insertOne({
+  key: "global",
+  tags: [
+    { id: "seed-1", name: "work", createdAt: new Date() },
+    { id: "seed-2", name: "urgent", createdAt: new Date() }
+  ],
+  updatedAt: new Date()
+});

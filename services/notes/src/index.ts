@@ -5,6 +5,7 @@ import http from "http";
 import { closeMongo, initMongo } from "./configs/mongo";
 import { getDbPool, initPostgres } from "./configs/postgres";
 import noteRoutes from "./routes/note.routes";
+import tagRoutes from "./routes/tag.routes";
 
 dotenv.config();
 
@@ -12,7 +13,8 @@ export const createApp = () => {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use("/", noteRoutes);
+  app.use("/notes", noteRoutes);
+  app.use("/tags", tagRoutes);
   return app;
 };
 

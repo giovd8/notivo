@@ -14,9 +14,9 @@ import { authMiddleware } from "./middlewares/auth";
 const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z.enum(["development", "production"]).default("development"),
-  AUTH_SERVICE_URL: z.string().url().default("http://auth-service:3000"),
-  USERS_SERVICE_URL: z.string().url().default("http://users-service:3000"),
-  NOTES_SERVICE_URL: z.string().url().default("http://notes-service:3000"),
+  AUTH_SERVICE_URL: z.string().url().default("http://auth-service:3001"),
+  USERS_SERVICE_URL: z.string().url().default("http://users-service:3002"),
+  NOTES_SERVICE_URL: z.string().url().default("http://notes-service:3003"),
   CORS_ORIGIN: z.string().optional(),
 });
 const env = EnvSchema.parse(process.env);
@@ -55,7 +55,6 @@ app.get("/health", (_req, res) => {
 app.get("/ready", (_req, res) => {
   res.status(200).json({ message: "ready" });
 });
-
 
 app.use("/auth", createProxyMiddleware({
   target: env.AUTH_SERVICE_URL,

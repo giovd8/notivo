@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- ================================
--- TABELLA ACCOUNTS (Auth)
+-- TABELLA ACCOUNTS
 -- ================================
 CREATE TABLE IF NOT EXISTS accounts (
   user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
@@ -44,14 +44,11 @@ CREATE TABLE IF NOT EXISTS notes_shared (
 -- ================================
 CREATE TABLE IF NOT EXISTS tags (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR(50) UNIQUE NOT NULL
+  name VARCHAR(50) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
 );
 
--- ================================
--- TABELLA NOTES_TAGS
--- ================================
-CREATE TABLE IF NOT EXISTS notes_tags (
-  note_id UUID NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-  tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-  PRIMARY KEY (note_id, tag_id)
-);
+-- Safe alter for existing databases
+ALTER TABLE IF EXISTS tags
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW();
+

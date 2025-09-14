@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { verify, type JwtPayload, type Secret } from "jsonwebtoken";
+import { publicRoutes } from "../configs/public-routes";
 
 const getAccessSecret = (): Secret => process.env.JWT_ACCESS_SECRET || "dev-access-secret";
 
@@ -17,6 +18,9 @@ const parseCookies = (cookieHeader?: string): Record<string, string> => {
 };
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  if (publicRoutes.some(route => req.originalUrl.startsWith(route.url) && route.method === req.method)) {
+    return next();
+  }
   const cookies = parseCookies(req.headers.cookie);
   const cookieToken = cookies["accessToken"];
   const authHeader = req.headers.authorization;

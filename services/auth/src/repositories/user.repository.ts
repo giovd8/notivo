@@ -2,7 +2,7 @@ import { getDbPool } from "../configs/postgres";
 import { UserDTO, UserEntity } from "../models/user";
 
 const getBaseUrl = () => {
-  return process.env.USERS_SERVICE_URL || "http://users-service:3000";
+  return process.env.USERS_SERVICE_URL || "http://users-service:3002";
 };
 
 export const findUserById = async (id: string): Promise<UserEntity | null> => {

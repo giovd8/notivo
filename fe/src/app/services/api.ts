@@ -26,20 +26,26 @@ export class ApiService {
   }
 
   createNote(payload: NotePayload): Observable<NotivoResponse<Note>> {
-    return this.http.post<NotivoResponse<Note>>(`/api/note/notes`, payload, {
+    return this.http.post<NotivoResponse<Note>>(`/api/notes`, payload, {
+      withCredentials: true,
+    });
+  }
+
+  updateNote(id: string, payload: NotePayload): Observable<NotivoResponse<Note>> {
+    return this.http.put<NotivoResponse<Note>>(`/api/notes/${id}`, payload, {
       withCredentials: true,
     });
   }
 
   listNotes(): Observable<NotivoResponse<Note[]>> {
-    return this.http.get<NotivoResponse<Note[]>>(`/api/note/notes`, { withCredentials: true });
+    return this.http.get<NotivoResponse<Note[]>>(`/api/notes`, { withCredentials: true });
   }
 
   deleteNote(id: string): Observable<void> {
-    return this.http.delete<void>(`/api/note/notes/${id}`, { withCredentials: true });
+    return this.http.delete<void>(`/api/notes/${id}`, { withCredentials: true });
   }
 
   getUser(): Observable<User> {
-    return this.http.get<User>(`/api/user/user`, { withCredentials: true });
+    return this.http.get<User>(`/api/user`, { withCredentials: true });
   }
 }

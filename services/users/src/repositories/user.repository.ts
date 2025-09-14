@@ -12,12 +12,16 @@ const createUser = async (username: string): Promise<UserEntity> => {
     [username]
   );
   const created = result.rows[0] as UserEntity;
-  await updateUsersCacheOnCreate(created);
-  await UserNotesCacheModel.updateOne(
-    { userId: created.id },
-    { $setOnInsert: { notes: [], updatedAt: new Date() } },
-    { upsert: true }
-  );
+  try {
+    await updateUsersCacheOnCreate(created);
+    await UserNotesCacheModel.updateOne(
+      { userId: created.id },
+      { $setOnInsert: { notes: [], updatedAt: new Date() } },
+      { upsert: true }
+    );
+  } catch (_err) {
+    // cache update failure should not block user creation
+  }
   return created;
 };
 
