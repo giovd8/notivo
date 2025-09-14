@@ -1,8 +1,15 @@
 import { computed, inject } from '@angular/core';
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { finalize, share, switchMap, tap } from 'rxjs';
 import { NotivoResponse } from '../../core/models';
-import { ApiService } from '../../services/api';
+import { NoteService } from '../../services/note';
 import { Note, NotePayload } from '../../shared/models/note';
 
 interface NoteFiltersState {
@@ -58,12 +65,12 @@ export const NoteStore = signalStore(
     }),
   })),
   withMethods((store) => {
-    const api = inject(ApiService);
+    const api = inject(NoteService);
 
     return {
       load: () => {
         patchState(store, { loading: true });
-        return api.listNotes().pipe(
+        return api.getAll().pipe(
           tap((res: NotivoResponse<Note[]>) => {
             patchState(store, { notes: res.data });
           }),
@@ -74,7 +81,7 @@ export const NoteStore = signalStore(
 
       refresh: () => {
         patchState(store, { loading: true });
-        return api.listNotes().pipe(
+        return api.getAll().pipe(
           tap((res: NotivoResponse<Note[]>) => {
             patchState(store, { notes: res.data });
           }),
@@ -99,9 +106,9 @@ export const NoteStore = signalStore(
 
       create: (payload: NotePayload) => {
         patchState(store, { loading: true });
-        return api.createNote(payload).pipe(
+        return api.createOne(payload).pipe(
           // After creation, reset filters and reload the full list from DB
-          switchMap(() => api.listNotes()),
+          switchMap(() => api.getAll()),
           tap((res: NotivoResponse<Note[]>) => {
             patchState(store, {
               notes: res.data,
@@ -115,7 +122,7 @@ export const NoteStore = signalStore(
 
       update: (id: string, payload: NotePayload) => {
         patchState(store, { loading: true });
-        return api.updateNote(id, payload).pipe(
+        return api.updateOne(id, payload).pipe(
           tap((res: NotivoResponse<Note>) => {
             const updated = res.data;
             const updatedList = store.notes().map((n) => (n.id === updated.id ? updated : n));
@@ -128,7 +135,7 @@ export const NoteStore = signalStore(
 
       remove: (id: string) => {
         patchState(store, { loading: true });
-        return api.deleteNote(id).pipe(
+        return api.deleteOne(id).pipe(
           tap(() => {
             const updatedList = store.notes().filter((n) => n.id !== id);
             patchState(store, { notes: updatedList });
@@ -136,6 +143,13 @@ export const NoteStore = signalStore(
           finalize(() => patchState(store, { loading: false })),
           share()
         );
+      },
+    };
+  }),
+  withHooks((store) => {
+    return {
+      onInit: () => {
+        store.load().subscribe();
       },
     };
   })

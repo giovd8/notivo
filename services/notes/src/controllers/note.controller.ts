@@ -28,7 +28,7 @@ const listNotes = async (
     const userId = String(req.headers["x-user-id"] || "");
     if (!userId) throw new ServerError("Unauthorized", 401)
     const notes = await noteRepository.listNotes(userId);
-    return res.status(200).json({ message: "Notes fetched", data: notes });
+    return res.status(200).json({ message: "Notes fetched", data: notes ?? [] });
   } catch (err: any) {
     throw new ServerError(err?.message, err?.status);
   }

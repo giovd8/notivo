@@ -29,17 +29,6 @@ export class Sidenav {
   initial = computed(() => (this.username() ? this.username().charAt(0).toUpperCase() : ''));
   version = signal<string>(packageJson.version);
 
-  constructor() {
-    // // Router events subscription
-    // this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
-    //   if (event instanceof NavigationEnd || event instanceof Scroll) {
-    //     // Used scroll with NavigationEnd because on refresh page (after modified auth guard) NavigationEnd is not triggered
-    //     if (event instanceof NavigationEnd) this.currentRoute = event.url;
-    //     else this.currentRoute = event.routerEvent.url;
-    //   }
-    // });
-  }
-
   logout(): void {
     this.authStore
       .logout()

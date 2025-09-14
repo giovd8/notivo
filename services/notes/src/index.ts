@@ -13,7 +13,7 @@ export const createApp = () => {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use("/notes", noteRoutes);
+  app.use("/", noteRoutes);
   app.use("/tags", tagRoutes);
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const message = err?.message ? err.message : 'Internal server error';

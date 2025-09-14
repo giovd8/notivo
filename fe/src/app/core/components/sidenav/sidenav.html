@@ -37,7 +37,7 @@
         @for (item of sidenavItems(); track $index) {
         <li
           routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
+          [routerLinkActiveOptions]="{ exact: false }"
           #rla="routerLinkActive"
         >
           @if (item.spacing) {

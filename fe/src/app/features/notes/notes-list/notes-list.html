@@ -1,15 +1,26 @@
-<div class="max-w-6xl mx-auto p-4 flex flex-col gap-4">
+<div class="h-full w-full p-4 flex flex-col gap-4">
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-semibold">Le tue note</h1>
-    <a class="notivo-btn-primary notivo-focus" routerLink="/notes/add">
-      <i class="bi bi-plus"></i>
-      Nuova nota
-    </a>
+    <a class="notivo-btn-primary notivo-focus" routerLink="/notes/add"> Aggiungi nota </a>
   </div>
   @if(isLoading()) {
-  <div class="text-dark">Caricamento…</div>
+  <div class="flex flex-col items-center justify-center text-center gap-2 py-10 h-full">
+    <notivo-spinner />
+    <!-- <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div> -->
+    <p class="text-dark">Caricamento note in corso…</p>
+  </div>
   } @else if(notes().length === 0) {
-  <div class="notivo-card text-dark text-sm">Nessuna nota disponibile.</div>
+  <div class="flex flex-col items-center justify-center text-center gap-1 py-10 h-full">
+    <div
+      class="h-16 w-16 rounded-2xl border inline-flex items-center justify-center bg-primary/10 text-primary border-primary"
+    >
+      <i class="bi bi-journal-x text-3xl" aria-hidden="true"></i>
+      <span class="sr-only">Nessuna nota disponibile</span>
+    </div>
+    <h2 class="text-lg font-medium">Nessuna nota</h2>
+    <p class="text-dark">Non ci sono note disponibili.</p>
+    <p class="text-dark">Aggiungi una nota tramite il pulsante "Aggiungi nota" in alto a destra.</p>
+  </div>
   } @else {
 
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

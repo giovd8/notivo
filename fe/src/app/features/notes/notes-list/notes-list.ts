@@ -1,24 +1,17 @@
 import { DatePipe, NgClass } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  Signal,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs/operators';
 import { AuthStore } from '../../../auth/auth.store';
-import { NotivoResponse, ToastType } from '../../../core/models';
+import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
-import { NoteService } from '../../../services/note';
+import { Spinner } from '../../../shared/components/spinner/spinner';
 import { Tooltip } from '../../../shared/components/tooltip/tooltip';
 import { Note } from '../../../shared/models/note';
+import { NoteStore } from '../../stores/note';
 
 @Component({
   selector: 'notivo-notes-list',
-  imports: [RouterLink, NgClass, DatePipe, Tooltip],
+  imports: [RouterLink, NgClass, DatePipe, Tooltip, Spinner],
   templateUrl: './notes-list.html',
   styles: `
     .clamp-10 {
@@ -31,38 +24,14 @@ import { Note } from '../../../shared/models/note';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotesList {
-  private readonly api = inject(NoteService);
   private readonly auth = inject(AuthStore);
   private readonly toast = inject(ToastService);
-
-  protected readonly isLoading = signal<boolean>(false);
-  protected readonly notes = signal<Note[]>([]);
+  private readonly noteStore = inject(NoteStore);
+  protected readonly isLoading: Signal<boolean> = computed(() => this.noteStore.loading());
+  protected readonly notes: Signal<Note[]> = computed(() => this.noteStore.filteredNotes());
   protected readonly currentUserId: Signal<string | null> = computed(
     () => this.auth.user()?.id ?? null
   );
-
-  constructor() {
-    this.fetchNotes();
-  }
-
-  protected fetchNotes(): void {
-    this.isLoading.set(true);
-    this.api
-      .getAll()
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (res: NotivoResponse<Note[]>) => {
-          this.notes.set(res.data ?? []);
-        },
-        error: () => {
-          this.toast.show({
-            message: 'Errore nel recupero delle note',
-            type: ToastType.Error,
-            seconds: 5,
-          });
-        },
-      });
-  }
 
   protected canDelete(note: Note): boolean {
     return (this.currentUserId() ?? '') === note.ownerId;
@@ -94,10 +63,9 @@ export class NotesList {
 
   protected delete(note: Note): void {
     if (!this.canDelete(note)) return;
-    this.api.deleteOne(note.id).subscribe({
+    this.noteStore.remove(note.id).subscribe({
       next: () => {
         this.toast.show({ message: 'Nota eliminata', type: ToastType.Success, seconds: 3 });
-        this.notes.set(this.notes().filter((n) => n.id !== note.id));
       },
       error: () => {
         this.toast.show({ message: 'Errore eliminazione nota', type: ToastType.Error, seconds: 5 });

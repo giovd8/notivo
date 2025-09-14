@@ -8,21 +8,21 @@ export const sidenavItems: SidenavItem[] = [
     spacing: false,
   },
   {
-    title: 'Tutte le note',
+    title: 'Note',
     icon: 'bi bi-file-earmark-text',
     route: '/notes',
-    spacing: true,
-  },
-  {
-    title: 'Le mie note',
-    icon: 'bi bi-file-earmark-person',
-    route: 'notes/my',
     spacing: false,
   },
-  {
-    title: 'Condivise con me',
-    icon: 'bi bi-people',
-    route: 'notes/shared',
-    spacing: false,
-  },
+  // {
+  //   title: 'Le mie note',
+  //   icon: 'bi bi-file-earmark-person',
+  //   route: 'notes/my',
+  //   spacing: false,
+  // },
+  // {
+  //   title: 'Condivise con me',
+  //   icon: 'bi bi-people',
+  //   route: 'notes/shared',
+  //   spacing: false,
+  // },
 ];
