@@ -41,6 +41,17 @@ export class FocusHandler {
         event.preventDefault();
         this.optionSelected.emit(this.currentIndex);
         break;
+      case ' ':
+      case 'Spacebar':
+        event.preventDefault();
+        this.optionSelected.emit(this.currentIndex);
+        break;
+      case 'Escape':
+        // Let parent listen to this to close
+        (this.el.nativeElement as HTMLElement).dispatchEvent(
+          new CustomEvent('escapePressed', { bubbles: true })
+        );
+        break;
       default:
         break;
     }

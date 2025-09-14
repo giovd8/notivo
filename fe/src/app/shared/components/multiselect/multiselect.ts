@@ -31,6 +31,15 @@ export class Multiselect {
   id: number = Math.floor(Math.random() * 1000);
   optionsRef = signal<LabelValueCheck[]>([]);
 
+  // accessibility ids
+  get buttonId(): string {
+    return `multiselect-button-${this.id}`;
+  }
+
+  get listboxId(): string {
+    return `multiselect-listbox-${this.id}`;
+  }
+
   constructor() {
     effect(() => {
       if (!!this.options()) {
@@ -87,5 +96,20 @@ export class Multiselect {
         .filter((option) => (option as LabelValueCheck).isChecked)
         .map((option) => option.value as string)
     );
+  }
+
+  open(event?: KeyboardEvent): void {
+    if (this.disabled()) return;
+    if (event) {
+      // Prevent default for keys that would scroll or click the page
+      if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'ArrowDown') {
+        event.preventDefault();
+      }
+    }
+    this.showOptions.set(true);
+  }
+
+  openFromKey(event: Event): void {
+    this.open(event as KeyboardEvent);
   }
 }

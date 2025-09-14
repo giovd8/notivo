@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 import Quill from 'quill';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
-import { ApiService } from '../../../services/api';
+import { NoteService } from '../../../services/note';
 import { Multiselect } from '../../../shared/components/multiselect/multiselect';
 
 @Component({
@@ -29,7 +29,7 @@ import { Multiselect } from '../../../shared/components/multiselect/multiselect'
 })
 export class CreateEditNote {
   private readonly fb = new FormBuilder();
-  private readonly api = inject(ApiService);
+  private readonly api = inject(NoteService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -123,7 +123,7 @@ export class CreateEditNote {
         .filter(Boolean) ?? [];
 
     this.api
-      .createNote({
+      .createOne({
         title: this.form.value.title!,
         body: this.form.value.body!,
         sharedWith,

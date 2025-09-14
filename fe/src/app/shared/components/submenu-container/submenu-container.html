@@ -20,7 +20,16 @@
       </div>
     </div>
     <div class="absolute top-[9px] flex flex-col items-center z-40 w-full">
-      <ul class="notivo-card max-h-[250px] overflow-y-auto w-full !p-0.5" notivoFocusHandler>
+      <ul
+        class="notivo-card max-h-[250px] overflow-y-auto w-full !p-0.5"
+        notivoFocusHandler
+        role="listbox"
+        [attr.aria-multiselectable]="isMultiselect() ? 'true' : 'false'"
+        [attr.id]="listId() || null"
+        [attr.aria-labelledby]="labelledById() || null"
+        (optionSelected)="selectOptionByIndex($event)"
+        (escapePressed)="onClose.emit()"
+      >
         @if (isLoading()) {
         <div class="m-1 px-8 py-2 rounded-xl flex justify-center">
           <i class="bi bi-spinner-fill animate-spin"></i>
@@ -35,7 +44,9 @@
           [id]="'option-' + i"
           data-focusable
           class="flex justify-between items-center gap-4 m-1 px-4 py-2 relative rounded-xl text-sm z-50"
-          [tabIndex]="i"
+          [tabIndex]="i === 0 ? 0 : -1"
+          role="option"
+          [attr.aria-selected]="hasCheck(option) ? option.isChecked : null"
         >
           <div class="flex flex-col">
             <div class="flex items-center gap-2">

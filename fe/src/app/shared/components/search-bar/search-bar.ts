@@ -17,6 +17,18 @@ export class SearchBar {
   readonly disabled = input<boolean>(false);
   readonly value = input<string>('');
   readonly placeholder = input<string>('Scrivi per cercare');
+  // Accessibility inputs
+  readonly ariaLabel = input<string>('Cerca');
+  readonly clearButtonAriaLabel = input<string>('Cancella ricerca');
+
+  // IDs for label/input association
+  private readonly uid: number = Math.floor(Math.random() * 100000);
+  get inputId(): string {
+    return `search-input-${this.uid}`;
+  }
+  get labelId(): string {
+    return `search-label-${this.uid}`;
+  }
 
   constructor() {
     this.searchStringFormControl = new FormControl<string | null>('');

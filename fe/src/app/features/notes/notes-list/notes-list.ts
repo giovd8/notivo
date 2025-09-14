@@ -12,7 +12,7 @@ import { finalize } from 'rxjs/operators';
 import { AuthStore } from '../../../auth/auth.store';
 import { NotivoResponse, ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
-import { ApiService } from '../../../services/api';
+import { NoteService } from '../../../services/note';
 import { Tooltip } from '../../../shared/components/tooltip/tooltip';
 import { Note } from '../../../shared/models/note';
 
@@ -31,7 +31,7 @@ import { Note } from '../../../shared/models/note';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotesList {
-  private readonly api = inject(ApiService);
+  private readonly api = inject(NoteService);
   private readonly auth = inject(AuthStore);
   private readonly toast = inject(ToastService);
 
@@ -48,7 +48,7 @@ export class NotesList {
   protected fetchNotes(): void {
     this.isLoading.set(true);
     this.api
-      .listNotes()
+      .getAll()
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res: NotivoResponse<Note[]>) => {
@@ -94,7 +94,7 @@ export class NotesList {
 
   protected delete(note: Note): void {
     if (!this.canDelete(note)) return;
-    this.api.deleteNote(note.id).subscribe({
+    this.api.deleteOne(note.id).subscribe({
       next: () => {
         this.toast.show({ message: 'Nota eliminata', type: ToastType.Success, seconds: 3 });
         this.notes.set(this.notes().filter((n) => n.id !== note.id));

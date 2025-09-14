@@ -1,37 +1,35 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { NotivoResponse } from '../core/models';
 import { Note, NotePayload } from '../shared/models/note';
-import { User } from '../shared/models/user';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ApiService {
+export class NoteService {
   private readonly http = inject(HttpClient);
 
-  createNote(payload: NotePayload): Observable<NotivoResponse<Note>> {
+  createOne(payload: NotePayload): Observable<NotivoResponse<Note>> {
     return this.http.post<NotivoResponse<Note>>(`/api/notes`, payload, {
       withCredentials: true,
     });
   }
 
-  updateNote(id: string, payload: NotePayload): Observable<NotivoResponse<Note>> {
+  updateOne(id: string, payload: NotePayload): Observable<NotivoResponse<Note>> {
     return this.http.put<NotivoResponse<Note>>(`/api/notes/${id}`, payload, {
       withCredentials: true,
     });
   }
 
-  listNotes(): Observable<NotivoResponse<Note[]>> {
-    return this.http.get<NotivoResponse<Note[]>>(`/api/notes`, { withCredentials: true });
+  getAll(search?: string, tags?: string[]): Observable<NotivoResponse<Note[]>> {
+    const params = new HttpParams();
+    if (search) params.set('search', search);
+    if (tags) params.set('tags', tags.join(','));
+    return this.http.get<NotivoResponse<Note[]>>(`/api/notes`, { withCredentials: true, params });
   }
 
-  deleteNote(id: string): Observable<void> {
+  deleteOne(id: string): Observable<void> {
     return this.http.delete<void>(`/api/notes/${id}`, { withCredentials: true });
-  }
-
-  getUser(): Observable<User> {
-    return this.http.get<User>(`/api/user`, { withCredentials: true });
   }
 }

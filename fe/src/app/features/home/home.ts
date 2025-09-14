@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ApiService } from '../../services/api';
+import { NoteService } from '../../services/note';
 import { AddNoteButton } from '../../shared/components/add-note-button/add-note-button';
 
 @Component({
@@ -10,5 +10,5 @@ import { AddNoteButton } from '../../shared/components/add-note-button/add-note-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
-  readonly api = inject(ApiService);
+  readonly api = inject(NoteService);
 }

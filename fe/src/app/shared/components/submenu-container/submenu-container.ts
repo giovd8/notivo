@@ -28,6 +28,8 @@ export class SubmenuContainer {
   isLoading = input<boolean>(false);
   isMultiselect = input<boolean>(false);
   showSearchBar = input<boolean>(false);
+  listId = input<string>('');
+  labelledById = input<string>('');
 
   onOptionSelected = output<LabelValue | LabelValueCheck>();
   onClose = output<void>();
@@ -74,5 +76,13 @@ export class SubmenuContainer {
     const el = this.overlayOrigin.nativeElement as HTMLElement;
     const rect = el.getBoundingClientRect();
     return rect.width || el.clientWidth;
+  }
+
+  selectOptionByIndex(index: number): void {
+    const list = this.optionsFiltered();
+    if (!list || index == null) return;
+    const idx = Number(index);
+    if (isNaN(idx) || idx < 0 || idx >= list.length) return;
+    this.onOptionSelected.emit(list[idx]);
   }
 }

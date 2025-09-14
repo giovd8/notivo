@@ -76,9 +76,6 @@ export const AuthStore = signalStore(
               isAuthenticated: false,
             });
           }),
-          // finalize(() => {
-          //   router.navigate(['/login']);
-          // }),
           share()
         );
       },

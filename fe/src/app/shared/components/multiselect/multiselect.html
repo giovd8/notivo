@@ -1,8 +1,17 @@
 <button
   #button
+  type="button"
   (click)="!disabled() ? showOptions.set(true) : null"
   class="w-full flex items-center relative disabled:opacity-50"
   [disabled]="disabled()"
+  [attr.id]="buttonId"
+  aria-haspopup="listbox"
+  [attr.aria-expanded]="showOptions() ? 'true' : 'false'"
+  [attr.aria-controls]="showOptions() ? listboxId : null"
+  [attr.aria-label]="placeholder()"
+  (keydown.enter)="openFromKey($event)"
+  (keydown.space)="openFromKey($event)"
+  (keydown.arrowdown)="openFromKey($event)"
 >
   <div class="notivo-input flex gap-2 w-full !cursor-pointer">
     @if (!!getSelectedOptions()) {
@@ -17,6 +26,9 @@
   [isMultiselect]="true"
   [showSearchBar]="showSearchBar()"
   [options]="optionsRef()"
+  [origin]="button"
+  [listId]="listboxId"
+  [labelledById]="buttonId"
   (onClose)="showOptions.set(false)"
   (onOptionSelected)="setOption($event)"
 />
