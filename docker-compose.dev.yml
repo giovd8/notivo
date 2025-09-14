@@ -1,14 +1,14 @@
 services:
   frontend:
     build:
-      context: ./fe
+      context: ./frontend
       dockerfile: Dockerfile.dev
     command: npm run start -- --host 0.0.0.0 --port 4200 --poll 2000
     environment:
       CHOKIDAR_USEPOLLING: "1"
       WATCHPACK_POLLING: "true"
     volumes:
-      - ./fe:/app
+      - ./frontend:/app
       - /app/node_modules
   gateway:
     build:
