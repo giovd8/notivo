@@ -5,7 +5,7 @@ let pool: Pool | null = null;
 
 export const getDbPool = (): Pool => {
   if (pool) return pool;
-  const host = process.env.POSTGRES_HOST || "localhost";
+  const host = process.env.POSTGRES_HOST || "postgres";
   const port = Number(process.env.POSTGRES_PORT || 5432);
   const user = process.env.POSTGRES_USER || "user";
   const password = process.env.POSTGRES_PASSWORD || "pass";
