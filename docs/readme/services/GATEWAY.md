@@ -115,9 +115,3 @@ Rotte attualmente pubbliche (prefisso completo, match per `startsWith`):
   - `/auth/*` → `AUTH_SERVICE_URL`
   - `/notes/*` → `NOTES_SERVICE_URL` (con `authMiddleware`)
   - `/users/*` → `USERS_SERVICE_URL` (con `authMiddleware`)
-
-## Estensioni suggerite
-- Circuit breaker / retry (ad es. `http-proxy-middleware` + resilienza custom, o spostamento su un API Gateway dedicato).
-- Telemetria (OpenTelemetry) e correlation id end-to-end.
-- Arricchimento `public-routes` con pattern/regex e metodi multipli.
-- Configurazione CSP lato Nginx più restrittiva con allowlist dinamica per `connect-src`.

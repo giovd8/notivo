@@ -19,7 +19,6 @@ services:
       echo 'Starting nginx with SSL configuration...';
       nginx -g 'daemon off;'"
 
-  # Certbot (solo generazione certificati, no rinnovo)
   certbot:
     image: certbot/certbot:v2.11.0
     container_name: certbot
@@ -28,12 +27,11 @@ services:
       - letsencrypt:/etc/letsencrypt
     entrypoint: >
       sh -c "
-      certbot certonly --webroot -w /var/www/certbot
-      -d notivo.giovannividotto.it
+      certbot certonly --webroot -w /var/www/certbot \
+      -d notivo.giovannividotto.it \
       --email tuo@email.it --agree-tos --non-interactive
       "
 
-  # Frontend Angular
   frontend:
     build:
       context: ./frontend
@@ -47,7 +45,6 @@ services:
       interval: 30s
       retries: 3
 
-  # Gateway
   gateway:
     build:
       context: ./gateway
@@ -72,7 +69,6 @@ services:
       interval: 30s
       retries: 3
 
-  # Auth Service
   auth-service:
     build:
       context: ./services/auth
@@ -90,7 +86,6 @@ services:
       interval: 30s
       retries: 3
 
-  # Users Service
   users-service:
     build:
       context: ./services/users
@@ -108,7 +103,6 @@ services:
       interval: 30s
       retries: 3
 
-  # Notes Service
   notes-service:
     build:
       context: ./services/notes

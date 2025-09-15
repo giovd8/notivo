@@ -184,10 +184,3 @@ Da `frontend/`:
 
 - Le chiamate HTTP puntano a percorsi `/api/*` e utilizzano cookie (`withCredentials: true`) per la gestione sessione.
 - In ambiente di sviluppo, il reverse proxy (gateway) instrada le richieste verso i microservizi (`auth`, `notes`, `users`).
-
-### Estensioni future suggerite
-
-- Riattivazione toast in `error-interceptor` e definizione pattern di notifica.
-- Implementazione logout automatico su `401` con redirect condizionato.
-- Aggiunta error/retry strategy per chiamate critiche e indicatori UX uniformi.
-- Test di integrazione per guard e store tramite harness e TestBed standalone.

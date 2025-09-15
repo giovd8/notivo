@@ -190,7 +190,3 @@ docker image prune
 - [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Guida completa alla documentazione
 - [swagger.yaml](./swagger.yaml) - Specifica OpenAPI completa
 - [README.md](./README.md) - Documentazione principale del progetto
-
----
-
-**Nota**: La documentazione API è integrata nel gateway e disponibile automaticamente quando avvii i servizi con Docker Compose.
