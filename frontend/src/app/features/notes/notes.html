@@ -1,8 +1,8 @@
-<div class="flex gap-4 w-full h-full p-1">
-  <div class="w-[400px] notivo-card !bg-gray-50">
+<div class="flex gap-4 w-full h-full">
+  <div class="w-[400px] notivo-card !bg-gray-50 !shadow-none">
     <notivo-notes-list [(selectedNote)]="selectedNote" (showForm)="showForm.set($event)" />
   </div>
-  <div class="flex-1 notivo-card">
+  <div class="flex-1 notivo-card !shadow-none">
     @if(selectedNote() && !showForm()) {
     <notivo-note-details [note]="selectedNote()" (showForm)="showForm.set($event)" />
     } @if(selectedNote() && showForm()) {

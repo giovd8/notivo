@@ -1,7 +1,13 @@
-<main class="w-full">
-  <section>
+<main class="w-full h-full flex flex-col">
+  <section class="flex flex-col h-full">
     <h1 class="text-xl font-semibold mb-4">{{ note() ? 'Modifica nota' : 'Crea nota' }}</h1>
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate aria-describedby="note-help">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate
+      aria-describedby="note-help"
+      class="flex flex-col h-full"
+    >
       <p id="note-help" class="text-sm text-gray-600 mb-4">
         I campi contrassegnati sono obbligatori.
       </p>
@@ -22,32 +28,34 @@
         />
       </div>
 
-      <div class="mb-4">
-        <label for="sharedWith" class="block text-sm font-medium mb-1">Condividi</label>
-        <notivo-multiselect
-          [options]="userOptions()"
-          [selectedOptions]="selectedUsersLV()"
-          (onOptionsSelectedChange)="onSharedWithSelectedChange($event)"
-        />
+      <div class="flex gap-4 mb-4">
+        <div class="flex-1">
+          <label for="sharedWith" class="block text-sm font-medium mb-1">Condividi</label>
+          <notivo-multiselect
+            [options]="userOptions()"
+            [selectedOptions]="selectedUsersLV()"
+            (onOptionsSelectedChange)="onSharedWithSelectedChange($event)"
+          />
+        </div>
+
+        <div class="flex-1">
+          <label for="tags" class="block text-sm font-medium mb-1">Tag</label>
+          <notivo-multiselect
+            [options]="tagOtions()"
+            [selectedOptions]="selectedTagsLV()"
+            placeholder="Seleziona tag"
+            (onOptionsSelectedChange)="onTagsSelectedChange($event)"
+          />
+        </div>
       </div>
 
-      <div class="mb-6">
-        <label for="tags" class="block text-sm font-medium mb-1">Tag</label>
-        <notivo-multiselect
-          [options]="tagOtions()"
-          [selectedOptions]="selectedTagsLV()"
-          placeholder="Seleziona tag"
-          (onOptionsSelectedChange)="onTagsSelectedChange($event)"
-        />
-      </div>
-
-      <div class="mb-4">
+      <div class="flex flex-col flex-1 mb-4">
         <label for="body-editor" class="block text-sm font-medium mb-1">Contenuto *</label>
-        <div #quillEditor id="quill-container" class="w-full !h-[40vh]"></div>
+        <div #quillEditor id="quill-container" class="w-full flex-1 min-h-0"></div>
         <input type="hidden" formControlName="body" />
       </div>
 
-      <div class="flex justify-end gap-3">
+      <div class="flex justify-end gap-3 mt-auto">
         <button type="button" class="notivo-btn-outline-primary" (click)="showForm.emit(false)">
           Annulla
         </button>
