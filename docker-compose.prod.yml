@@ -123,7 +123,10 @@ services:
   # Postgres
   postgres:
     image: postgres:15
-    env_file: .env
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: notivo
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -136,7 +139,9 @@ services:
   # Mongo
   mongo:
     image: mongo:7
-    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pass
     volumes:
       - mongo_data:/data/db
       - ./database/mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
