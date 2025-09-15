@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../../auth/auth.store';
+import { Modal } from '../../../core/components/modal/modal';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
 import { ModalService } from '../../../services/modal.service';
-import { Modal } from '../../../shared/components/modal/modal';
 import { Spinner } from '../../../shared/components/spinner/spinner';
 import { Tooltip } from '../../../shared/components/tooltip/tooltip';
 import { Note } from '../../../shared/models/note';

@@ -2,12 +2,13 @@ import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { AuthStore } from './auth/auth.store';
+import { Modal } from './core/components/modal/modal';
 import { Sidenav } from './core/components/sidenav/sidenav';
 import { Toast } from './core/components/toast/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidenav, Toast],
+  imports: [RouterOutlet, Sidenav, Toast, Modal],
   templateUrl: './app.html',
   styles: [],
 })
