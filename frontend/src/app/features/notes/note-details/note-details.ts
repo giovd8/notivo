@@ -1,5 +1,14 @@
 import { DatePipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Signal, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Signal,
+  computed,
+  inject,
+  input,
+  model,
+  output,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../../auth/auth.store';
 import { ToastType } from '../../../core/models';
@@ -29,12 +38,14 @@ export class NoteDetails {
   private readonly modalService = inject(ModalService);
   protected readonly isLoading: Signal<boolean> = computed(() => this.noteStore.loading());
   private readonly noteId: string = this.route.snapshot.paramMap.get('id') ?? '';
-  protected readonly note: Signal<Note | undefined> = computed(() =>
-    this.noteStore.filteredNotes().find((n) => n.id === this.noteId)
-  );
+
   protected readonly currentUserId: Signal<string | null> = computed(
     () => this.auth.user()?.id ?? null
   );
+
+  note = input<Note | null>(null);
+  selectedNote = model<Note | null>(null);
+  showForm = output<boolean>();
 
   protected getShareBadge(
     note: Note | undefined
@@ -78,6 +89,7 @@ export class NoteDetails {
 
   protected deleteNote(): void {
     const current = this.note();
+    if (!current) return;
     if (!this.canDelete(current)) return;
     this.noteStore.remove(current!.id).subscribe({
       next: () => {

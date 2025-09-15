@@ -1,10 +1,15 @@
-<div class="h-full w-full flex flex-col gap-4">
+<div class="h-full w-full flex flex-col gap-4 overflow-y-hidden p-1">
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-semibold">Le tue note</h1>
-    <a class="notivo-btn-primary notivo-focus" routerLink="/notes/add"> Aggiungi nota </a>
+    <a
+      class="notivo-btn-primary notivo-focus"
+      (click)="selectedNote.set(null); showForm.emit(true)"
+    >
+      Aggiungi nota
+    </a>
   </div>
 
-  <div class="flex flex-wrap items-center gap-3">
+  <div class="flex flex-col gap-3">
     <notivo-search-bar
       [value]="searchText()"
       placeholder="Cerca nelle note"
@@ -13,11 +18,21 @@
     <notivo-multiselect
       [options]="commonStore.tagOptions()"
       [isLoading]="commonStore.loading()"
+      [selectedOptions]="selectedTags()"
       placeholder="Filtra per tag"
       (onOptionsSelectedChange)="onTagsChange($event)"
     />
-    <button class="notivo-btn-outline-primary" type="button" (click)="noteStore.clearFilters()">
-      Pulisci filtri
+  </div>
+
+  <div class="flex items-center justify-center gap-3">
+    <notivo-notes-legend />
+    <button
+      class="notivo-btn-danger-outline text-sm !gap-1 !px-2"
+      type="button"
+      (click)="noteStore.clearFilters()"
+    >
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+      Filtri
     </button>
   </div>
   @if(isLoading()) {
@@ -40,14 +55,12 @@
   </div>
   } @else {
 
-  <div class="flex justify-center">
-    <notivo-notes-legend />
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+  <div class="flex flex-col gap-4 pb-4 overflow-y-auto overflow-x-hidden">
     @for(note of notes(); track note.id) {
     <div
-      class="notivo-card flex flex-col gap-1 cursor-pointer"
-      (click)="openDetails(note.id)"
+      class="notivo-card flex flex-col gap-1 cursor-pointer transition-all duration-300"
+      (click)="selectedNote.set(note)"
+      [class.!border-primary]="selectedNote()?.id === note.id"
       tabindex="0"
       role="button"
       [attr.aria-label]="'Apri nota ' + note.title"

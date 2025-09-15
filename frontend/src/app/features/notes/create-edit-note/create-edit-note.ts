@@ -4,6 +4,8 @@ import {
   computed,
   ElementRef,
   inject,
+  input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -14,11 +16,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import Quill from 'quill';
 import { ToastType } from '../../../core/models';
 import { ToastService } from '../../../core/services/toast';
 import { Multiselect } from '../../../shared/components/multiselect/multiselect';
+import { Note } from '../../../shared/models/note';
 import { LabelValue } from '../../../shared/models/utils';
 import { CommonStore } from '../../stores/common';
 import { NoteStore } from '../../stores/note';
@@ -34,8 +37,6 @@ export class CreateEditNote {
   private readonly fb = new FormBuilder();
   private readonly store = inject(NoteStore);
   private readonly toast = inject(ToastService);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
   private readonly commonStore = inject(CommonStore);
   private readonly noteStore = inject(NoteStore);
   readonly tagOtions = computed(() => this.commonStore.tagOptions());
@@ -43,8 +44,6 @@ export class CreateEditNote {
   readonly isLoadingDataFromStore = computed(() => this.commonStore.loading());
 
   readonly submitting = signal(false);
-  private readonly noteId = signal<string | null>(null);
-  readonly isEditMode = computed(() => !!this.noteId());
   readonly selectedUsersLV = signal<LabelValue[]>([]);
   readonly selectedTagsLV = signal<LabelValue[]>([]);
 
@@ -70,19 +69,16 @@ export class CreateEditNote {
     tags: this.fb.nonNullable.control<string[]>([]),
   });
 
+  note = input<Note | null>(null);
+  showForm = output<boolean>();
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.noteId.set(id);
-    if (!id) return;
-    const notes = this.noteStore.notes();
-    let note = notes.find((n) => n.id === id);
-    if (note) {
-      this.patchFormFromNote(note);
+    if (!!this.note()) {
+      this.patchFormFromNote(this.note()!);
       return;
     }
     this.noteStore.refresh().subscribe({
       next: () => {
-        const fresh = this.noteStore.notes().find((n) => n.id === id);
+        const fresh = this.noteStore.notes().find((n) => n.id === this.note()?.id);
         if (fresh) this.patchFormFromNote(fresh);
       },
       error: () => {},
@@ -172,8 +168,8 @@ export class CreateEditNote {
       tags,
     };
 
-    const editingId = this.noteId();
-    if (editingId) {
+    const editingId = this.note()?.id;
+    if (!!editingId) {
       this.store.update(editingId, payload).subscribe({
         next: () => {
           this.toast.show({
@@ -181,7 +177,7 @@ export class CreateEditNote {
             type: ToastType.Success,
             seconds: 4,
           });
-          this.router.navigate(['/notes', editingId]);
+          this.showForm.emit(false);
         },
         error: (err: any) => {
           console.error(err);
@@ -202,7 +198,7 @@ export class CreateEditNote {
             type: ToastType.Success,
             seconds: 4,
           });
-          this.router.navigate(['/notes']);
+          this.showForm.emit(false);
         },
         error: (err: any) => {
           console.error(err);

@@ -4,7 +4,6 @@
   <input
     [formControl]="searchStringFormControl"
     [style.padding-left]="'2.5rem'"
-    [style.padding-right]="'2.5rem'"
     [placeholder]="placeholder()"
     class="notivo-input min-w-[250px] w-full"
     [attr.id]="inputId"
@@ -12,7 +11,7 @@
     [attr.aria-describedby]="labelId"
     type="search"
   />
-  @if (searchStringFormControl.value?.length) {
+  <!-- @if (searchStringFormControl.value?.length) {
   <button
     (click)="clear($event)"
     class="absolute right-4"
@@ -22,4 +21,5 @@
     <i class="bi bi-x-lg"></i>
   </button>
   }
+</div> -->
 </div>

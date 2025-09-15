@@ -13,14 +13,13 @@
       <span class="sr-only">Nota non trovata</span>
     </div>
     <h2 class="text-lg font-medium">Nota non trovata</h2>
-    <a class="notivo-btn-primary notivo-focus" routerLink="/notes">Torna alle note</a>
+    <a class="notivo-btn-primary notivo-focus" (click)="showForm.emit(false)">Torna alle note</a>
   </div>
   } @else {
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between gap-2">
-      <h1 class="text-2xl font-semibold">{{ note()!.title }}</h1>
-      <div class="flex items-center gap-2 text-sm text-dark">
-        @if(getShareBadge(note()); as badge) {
+      <div class="flex items-center gap-2">
+        @if(getShareBadge(note()!); as badge) {
         <notivo-tooltip [text]="badge.label" position="left">
           <span
             class="h-7 w-7 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1"
@@ -32,29 +31,28 @@
           </span>
         </notivo-tooltip>
         }
-        <span>{{ note()!.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
-        @if(canDelete(note())) {
-        <div class="flex items-center gap-2 justify-end ml-6">
-          <a
-            class="notivo-btn-outline-primary notivo-focus"
-            [routerLink]="['/notes', 'edit', note()!.id]"
-          >
-            <span>Modifica</span>
-          </a>
-          <button
-            class="notivo-btn-danger-outline notivo-focus"
-            type="button"
-            (click)="openDeleteModal()"
-          >
-            <span>Elimina</span>
-          </button>
-        </div>
-        }
+        <h1 class="text-2xl font-semibold">{{ note()!.title }}</h1>
       </div>
+      @if(canDelete(note()!)) {
+      <div class="flex items-center gap-2 justify-end ml-6">
+        <a class="notivo-btn-outline-primary notivo-focus" (click)="showForm.emit(true)">
+          <span>Modifica</span>
+        </a>
+        <button
+          class="notivo-btn-danger-outline notivo-focus"
+          type="button"
+          (click)="openDeleteModal()"
+        >
+          <span>Elimina</span>
+        </button>
+      </div>
+      }
     </div>
-
-    <div class="flex items-center gap-6 justify-between">
-      <div class="flex flex-col flex-1">
+    <div class="flex items-center gap-2 text-sm text-dark">
+      <span>{{ note()!.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
+    </div>
+    <div class="flex gap-8">
+      <div class="flex flex-col">
         <span class="text-sm font-medium">Tag</span>
         @if(note()!.tags && note()!.tags!.length > 0) {
         <div class="flex items-center gap-2 mt-2 flex-wrap">
@@ -68,7 +66,7 @@
         <p class="text-sm text-dark">Nessun tag</p>
         }
       </div>
-      <div class="flex flex-col flex-1">
+      <div class="flex flex-col justify-between">
         <span class="text-sm font-medium">Condivisa con</span>
         @if(note()!.sharedWith && note()!.sharedWith!.length > 0) {
         <div class="flex items-center gap-2 mt-2 flex-wrap">
@@ -79,14 +77,15 @@
           }
         </div>
         } @else {
-        <p class="text-sm text-dark">Nessun condiviso</p>
+        <p class="text-sm text-dark">Non condivisa</p>
         }
       </div>
     </div>
-    <div class="overflow-hidden pt-10">
-      <div class="text-sm inner-a" [innerHTML]="note()!.body"></div>
-    </div>
   </div>
+  <div class="overflow-hidden pt-10">
+    <div class="text-sm inner-a" [innerHTML]="note()!.body"></div>
+  </div>
+
   }
 </div>
 

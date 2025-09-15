@@ -345,7 +345,9 @@ const loadVisibleNotes = async (userId: string): Promise<CachedNote[]> => {
     createdAt: n.createdAt,
     updatedAt: n.updatedAt,
   }));
-  return cached;
+  
+  // Sort notes by creation date (newest first)
+  return cached.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 };
 
 
@@ -358,7 +360,7 @@ const searchNotes = async (userId: string, search?: string, tags?: string[]): Pr
   const cached = await UserSearchCacheModel.findOne({ userId, key }).lean();
   if (cached && Array.isArray((cached as any).results)) {
     await UserSearchCacheModel.updateOne({ userId, key }, { $set: { lastUpdated: new Date() } });
-    return (((cached as any).results) || []).map((n: any) => ({
+    const cachedResults = (((cached as any).results) || []).map((n: any) => ({
       id: n.id,
       title: n.title,
       body: n.body,
@@ -368,6 +370,9 @@ const searchNotes = async (userId: string, search?: string, tags?: string[]): Pr
       createdAt: n.createdAt,
       updatedAt: n.updatedAt,
     } as NoteDTO));
+    
+    // Ensure cached results are also sorted (newest first)
+    return cachedResults.sort((a: NoteDTO, b: NoteDTO) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   // Load visible notes from Postgres
@@ -398,13 +403,16 @@ const searchNotes = async (userId: string, search?: string, tags?: string[]): Pr
     return match;
   });
 
+  // Sort filtered results before caching
+  const sortedFiltered = filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  
   await UserSearchCacheModel.updateOne(
     { userId, key },
-    { $set: { filter: { text: normalizedSearch, tags: normalizedTags }, results: filtered, lastUpdated: new Date() } },
+    { $set: { filter: { text: normalizedSearch, tags: normalizedTags }, results: sortedFiltered, lastUpdated: new Date() } },
     { upsert: true }
   );
 
-  return filtered.map((n: any) => ({
+  const noteDTOs = sortedFiltered.map((n: any) => ({
     id: n.id,
     title: n.title,
     body: n.body,
@@ -414,6 +422,8 @@ const searchNotes = async (userId: string, search?: string, tags?: string[]): Pr
     createdAt: n.createdAt,
     updatedAt: n.updatedAt,
   } as NoteDTO));
+  
+  return noteDTOs;
 };
 
 interface TestNoteInput {
