@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "3f4894a6-34c5-455b-91ab-907d9fb8d4fd",
+		"name": "Notito",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15580997"
+	},
+	"item": [
+		{
+			"name": "tags",
+			"item": [
+				{
+					"name": "store",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tags\": [\n    \"lavoro\",\n    \"personale\",\n    \"da fare\",\n    \"idea\",\n    \"importante\",\n    \"riunione\",\n    \"studio\",\n    \"riferimento\",\n    \"finanze\",\n    \"viaggio\"\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{BASE_URL}}/notes/tags",
+							"protocol": "https",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "store test users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"users\": [\n    {\n      \"username\": \"pippo\",\n      \"password\": \"pippo123\"\n    },\n    {\n      \"username\": \"pluto\",\n      \"password\": \"pluto123\"\n    },\n    {\n      \"username\": \"paperino\",\n      \"password\": \"paperino123\"\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{BASE_URL}}/auth/register/test-users",
+							"protocol": "https",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"register",
+								"test-users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "notes",
+			"item": [
+				{
+					"name": "store test notes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"id\": \"1\",\n    \"title\": \"Promemoria riunione settimanale\",\n    \"body\": \"<p>Martedì alle 9:00 si terrà la riunione settimanale del team. Verranno affrontati i temi legati all’avanzamento del progetto, alle criticità riscontrate e alle nuove idee proposte dai colleghi. Preparare in anticipo i punti da discutere.</p><p>Per eventuali aggiornamenti ufficiali consulta anche il portale del Governo: <a href=\\\"https://www.governo.it\\\" target=\\\"_blank\\\">governo.it</a></p>\",\n    \"ownerId\": \"pippo\",\n    \"sharedWith\": [\"pluto\"],\n    \"tags\": [\"lavoro\", \"riunione\", \"importante\"],\n    \"createdAt\": \"2025-09-14T10:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T10:00:00.000Z\"\n  },\n  {\n    \"id\": \"2\",\n    \"title\": \"Lista spesa\",\n    \"body\": \"<p>Devo ricordarmi di comprare i prodotti essenziali per la settimana. In particolare: latte, pane, uova, frutta fresca e verdure di stagione. Sarebbe utile fare un piano settimanale dei pasti per evitare sprechi.</p><p>Per consigli su alimentazione e salute puoi visitare il sito del Ministero della Salute: <a href=\\\"https://www.salute.gov.it\\\" target=\\\"_blank\\\">salute.gov.it</a></p>\",\n    \"ownerId\": \"pluto\",\n    \"sharedWith\": [],\n    \"tags\": [\"personale\", \"da fare\"],\n    \"createdAt\": \"2025-09-14T11:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T11:00:00.000Z\"\n  },\n  {\n    \"id\": \"3\",\n    \"title\": \"Idea progetto app\",\n    \"body\": \"<p>Mi è venuta in mente l’idea di sviluppare un’app mobile che permetta a gruppi di amici in viaggio di gestire le spese condivise. L’app potrebbe includere un sistema di divisione automatica dei costi e reminder per i pagamenti.</p><p>Per capire meglio la normativa fiscale e le linee guida sui pagamenti digitali, si può consultare il sito del MEF: <a href=\\\"https://www.mef.gov.it\\\" target=\\\"_blank\\\">mef.gov.it</a></p>\",\n    \"ownerId\": \"paperino\",\n    \"sharedWith\": [\"pippo\"],\n    \"tags\": [\"idea\", \"viaggio\", \"finanze\"],\n    \"createdAt\": \"2025-09-14T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T12:00:00.000Z\"\n  },\n  {\n    \"id\": \"4\",\n    \"title\": \"Appunti di studio Angular\",\n    \"body\": \"<p>Sto ripassando le novità di Angular: i componenti standalone semplificano molto la struttura, mentre i signals rappresentano un approccio moderno e performante per la gestione dello stato. Devo fare più esercizi pratici per consolidare i concetti.</p><p>Interessante anche consultare le iniziative di formazione promosse dal MIUR: <a href=\\\"https://www.miur.gov.it\\\" target=\\\"_blank\\\">miur.gov.it</a></p>\",\n    \"ownerId\": \"pippo\",\n    \"sharedWith\": [],\n    \"tags\": [\"studio\", \"importante\"],\n    \"createdAt\": \"2025-09-14T13:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T13:00:00.000Z\"\n  },\n  {\n    \"id\": \"5\",\n    \"title\": \"Link utile\",\n    \"body\": \"<p>Sto raccogliendo i link di riferimento per il lavoro. Uno dei più importanti è la documentazione ufficiale di Angular, che offre esempi chiari e guide pratiche. Sarebbe utile organizzare una libreria di risorse digitali condivise.</p><p>Per normativa e linee guida ufficiali sulle tecnologie digitali in Italia: <a href=\\\"https://www.agid.gov.it\\\" target=\\\"_blank\\\">agid.gov.it</a></p>\",\n    \"ownerId\": \"pluto\",\n    \"sharedWith\": [\"paperino\"],\n    \"tags\": [\"riferimento\", \"studio\"],\n    \"createdAt\": \"2025-09-14T14:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T14:00:00.000Z\"\n  },\n  {\n    \"id\": \"6\",\n    \"title\": \"Check list viaggio Roma\",\n    \"body\": \"<p>Prima della partenza per Roma devo assicurarmi di avere: i biglietti del treno, la prenotazione dell’hotel, un itinerario con i luoghi da visitare e i documenti personali. Sarebbe anche utile pianificare un budget giornaliero.</p><p>Per informazioni su viaggi e turismo in Italia: <a href=\\\"https://www.enit.it\\\" target=\\\"_blank\\\">enit.it</a></p>\",\n    \"ownerId\": \"paperino\",\n    \"sharedWith\": [\"pippo\", \"pluto\"],\n    \"tags\": [\"viaggio\", \"da fare\", \"personale\"],\n    \"createdAt\": \"2025-09-14T15:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T15:00:00.000Z\"\n  },\n  {\n    \"id\": \"7\",\n    \"title\": \"Budget mensile\",\n    \"body\": \"<p>Ho fissato l’obiettivo di risparmiare almeno 200€ questo mese. Devo monitorare le spese quotidiane e ridurre quelle superflue. Utilizzare una tabella di Excel o un’app potrebbe essere molto utile per avere più controllo.</p><p>Per informazioni ufficiali sulle pensioni e contributi: <a href=\\\"https://www.inps.it\\\" target=\\\"_blank\\\">inps.it</a></p>\",\n    \"ownerId\": \"pippo\",\n    \"sharedWith\": [],\n    \"tags\": [\"finanze\", \"personale\"],\n    \"createdAt\": \"2025-09-14T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T16:00:00.000Z\"\n  },\n  {\n    \"id\": \"8\",\n    \"title\": \"Task urgente\",\n    \"body\": \"<p>Devo assolutamente completare il report entro domani mattina. È fondamentale rispettare le scadenze per mantenere un buon flusso di lavoro e garantire la soddisfazione del cliente. Non rimandare!</p><p>Per scadenze ufficiali e adempimenti amministrativi: <a href=\\\"https://www.agenziaentrate.gov.it\\\" target=\\\"_blank\\\">agenziaentrate.gov.it</a></p>\",\n    \"ownerId\": \"pluto\",\n    \"sharedWith\": [\"paperino\"],\n    \"tags\": [\"lavoro\", \"da fare\", \"importante\"],\n    \"createdAt\": \"2025-09-14T17:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T17:00:00.000Z\"\n  },\n  {\n    \"id\": \"9\",\n    \"title\": \"Nuova feature\",\n    \"body\": \"<p>Vorrei proporre di introdurre una dark mode nella nostra web app. Questo migliorerebbe l’esperienza utente, soprattutto per chi lavora la sera. Potremmo iniziare con un prototipo e raccogliere feedback dagli utenti interni.</p><p>Per normative e linee guida sull’accessibilità: <a href=\\\"https://www.agid.gov.it/it/accessibilita\\\" target=\\\"_blank\\\">agid.gov.it</a></p>\",\n    \"ownerId\": \"paperino\",\n    \"sharedWith\": [\"pluto\"],\n    \"tags\": [\"idea\", \"lavoro\"],\n    \"createdAt\": \"2025-09-14T18:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T18:00:00.000Z\"\n  },\n  {\n    \"id\": \"10\",\n    \"title\": \"Citazione ispirante\",\n    \"body\": \"<p>“Il successo è la somma di piccoli sforzi ripetuti giorno dopo giorno.” Questa frase mi aiuta a rimanere motivato, soprattutto nei momenti di difficoltà. È importante non perdere mai di vista gli obiettivi a lungo termine.</p><p>Per leggere altri spunti ispiranti e ufficiali: <a href=\\\"https://www.istruzione.it\\\" target=\\\"_blank\\\">istruzione.it</a></p>\",\n    \"ownerId\": \"pippo\",\n    \"sharedWith\": [],\n    \"tags\": [\"personale\", \"riferimento\"],\n    \"createdAt\": \"2025-09-14T19:00:00.000Z\",\n    \"updatedAt\": \"2025-09-14T19:00:00.000Z\"\n  }\n]\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{BASE_URL}}/notes/test-notes",
+							"protocol": "https",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes",
+								"test-notes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
