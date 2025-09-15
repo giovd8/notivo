@@ -1,0 +1,17 @@
+<div class="flex gap-4 p-4 h-screen w-screen bg-gray-100 overflow-hidden">
+  @if (isUserLoggedIn()) {
+  <notivo-sidenav />
+  }
+  <div
+    class="flex-1 overflow-y-auto"
+    [style.backgroundImage]="!isUserLoggedIn() ? 'url(/auth.webp)' : null"
+    [style.backgroundSize]="!isUserLoggedIn() ? 'cover' : null"
+    [style.backgroundPosition]="!isUserLoggedIn() ? 'center' : null"
+    [style.backgroundRepeat]="!isUserLoggedIn() ? 'no-repeat' : null"
+  >
+    <router-outlet />
+  </div>
+  <notivo-toast />
+
+  <notivo-modal />
+</div>

@@ -1,0 +1,23 @@
+<div class="flex gap-4 w-full h-full p-1">
+  <div class="w-[400px] notivo-card !bg-gray-50">
+    <notivo-notes-list [(selectedNote)]="selectedNote" (showForm)="showForm.set($event)" />
+  </div>
+  <div class="flex-1 notivo-card">
+    @if(selectedNote() && !showForm()) {
+    <notivo-note-details [note]="selectedNote()" (showForm)="showForm.set($event)" />
+    } @if(selectedNote() && showForm()) {
+    <notivo-create-edit-note [note]="selectedNote()" (showForm)="showForm.set($event)" />
+    } @if(!selectedNote() && showForm()) {
+    <notivo-create-edit-note (showForm)="showForm.set($event)" />
+    } @if(!selectedNote() && !showForm()) {
+    <div class="flex flex-col gap-4 items-center justify-center h-full">
+      <div
+        class="h-16 w-16 rounded-2xl border inline-flex items-center justify-center bg-primary/10 text-primary border-primary"
+      >
+        <i class="bi bi-journal-x text-3xl" aria-hidden="true"></i>
+      </div>
+      <p class="text-dark">Seleziona una nota per visualizzarne i dettagli</p>
+    </div>
+    }
+  </div>
+</div>

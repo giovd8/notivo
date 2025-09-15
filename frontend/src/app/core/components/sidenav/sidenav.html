@@ -1,0 +1,71 @@
+<nav id="sidenav" aria-label="Navigazione principale" class="h-full">
+  <div class="flex flex-col items-center gap-8 select-none h-full rounded-lg">
+    <!-- Logo Section -->
+    <a routerLink="/" class="flex gap-2 items-center">
+      <img ngSrc="logo.webp" width="80" height="80" priority alt="Logo Notivo" class="w-20" />
+      <span class="text-2xl font-bold">Notivo</span>
+    </a>
+
+    <!-- User Section -->
+    <div class="w-full">
+      <section aria-label="Profilo utente" class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center text-base font-bold uppercase"
+          aria-hidden="true"
+        >
+          {{ initial() || '?' }}
+        </div>
+        <p class="text-sm font-medium truncate flex-1 min-w-0 capitalize" aria-live="polite">
+          {{ username() || 'Utente' }}
+        </p>
+        <notivo-tooltip text="Esci dall'applicazione">
+          <button
+            type="button"
+            (click)="logout()"
+            class="w-8 h-8 rounded-full bg-white/15 text-white flex items-center justify-center text-base font-bold uppercase"
+            aria-label="Esci dall'applicazione"
+          >
+            <i class="bi bi-box-arrow-right text-lg pl-1" aria-hidden="true"></i>
+          </button>
+        </notivo-tooltip>
+      </section>
+    </div>
+
+    <!-- Menu Section -->
+    <div class="flex flex-col justify-between w-full grow">
+      <ul class="w-full space-y-4">
+        @for (item of sidenavItems(); track $index) {
+        <li
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: false }"
+          #rla="routerLinkActive"
+        >
+          @if (item.spacing) {
+          <hr class="bg-tertiary my-4 rounded-full" />
+          }
+          <a
+            [routerLink]="item.route"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
+            class="notivo-focus px-4 rounded-2xl flex items-center gap-3"
+            [ngClass]="{ 'bg-white/15': rla.isActive }"
+          >
+            <i [ngClass]="item.icon" class="text-lg flex-shrink-0" aria-hidden="true"></i>
+            <span class="text-sm whitespace-nowrap overflow-hidden">
+              {{ item.title }}
+            </span>
+          </a>
+        </li>
+        }
+      </ul>
+      <!-- Footer Section -->
+      <div class="flex flex-col items-center gap-1 py-2 w-full overflow-hidden">
+        <hr />
+        <div class="flex flex-col items-center">
+          <!-- <img src="logo/logo.webp" alt="logo" class="h-10" /> -->
+          <span class="text-white text-sm font-bold">Notivo</span>
+          <span class="text-xs font-thin">v{{ version() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

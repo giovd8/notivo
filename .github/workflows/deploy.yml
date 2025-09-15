@@ -1,0 +1,43 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Copia SSH key e setta permessi
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZURE_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.AZURE_HOST }} >> ~/.ssh/known_hosts
+
+      # Copia repo sulla VM
+      - name: Copy files to VM
+        run: |
+          scp -r ./* ${{ secrets.AZURE_USER }}@${{ secrets.AZURE_HOST }}:/home/${{ secrets.AZURE_USER }}/app
+
+      # Copia .env se serve
+      - name: Copy .env
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > /tmp/.env
+          scp /tmp/.env ${{ secrets.AZURE_USER }}@${{ secrets.AZURE_HOST }}:/home/${{ secrets.AZURE_USER }}/app/.env
+
+      # SSH + deploy Docker Compose
+      - name: Deploy Docker Compose
+        run: |
+          ssh ${{ secrets.AZURE_USER }}@${{ secrets.AZURE_HOST }} << 'EOF'
+            cd /home/${{ secrets.AZURE_USER }}/app
+            docker-compose pull
+            docker-compose up -d --build
+          EOF

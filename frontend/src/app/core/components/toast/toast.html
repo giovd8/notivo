@@ -1,0 +1,44 @@
+@if (isVisible()) {
+<div
+  class="toast-container min-w-80 max-w-96 notivo-card !p-0"
+  [class]="type() === 'success' ? 'border-l-4 border-l-green-500' : 'border-l-4 border-l-red-500'"
+  [attr.role]="ariaRole()"
+  [attr.aria-live]="ariaLive()"
+  aria-atomic="true"
+>
+  <div class="flex items-start gap-3.5 p-5 relative">
+    <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center mt-0.5">
+      <i
+        class="bi text-xl"
+        [class]="
+          type() === ToastType.Success
+            ? 'bi-check-circle-fill text-green-500'
+            : 'bi-x-circle-fill text-red-500'
+        "
+        aria-hidden="true"
+      ></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-medium leading-relaxed text-dark m-0" id="toast-message">
+        {{ message() }}
+      </p>
+    </div>
+    <button
+      type="button"
+      [attr.aria-label]="type() === ToastType.Error ? 'Chiudi avviso' : 'Chiudi notifica'"
+      (click)="close()"
+      class="cursor-pointer"
+    >
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div
+    class="toast-progress absolute bottom-0 left-0 h-1"
+    [class]="
+      type() === 'success'
+        ? 'bg-gradient-to-r from-green-500 to-green-400'
+        : 'bg-gradient-to-r from-red-500 to-red-400'
+    "
+  ></div>
+</div>
+}

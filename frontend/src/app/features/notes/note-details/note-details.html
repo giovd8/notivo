@@ -1,0 +1,90 @@
+<div class="h-full w-full flex flex-col">
+  @if(isLoading()) {
+  <div class="flex flex-col items-center justify-center text-center gap-2 py-10 h-full">
+    <notivo-spinner />
+    <p class="text-dark">Caricamento nota…</p>
+  </div>
+  } @else if(!note()) {
+  <div class="flex flex-col items-center justify-center text-center gap-1 py-10 h-full">
+    <div
+      class="h-16 w-16 rounded-2xl border inline-flex items-center justify-center bg-primary/10 text-primary border-primary"
+    >
+      <i class="bi bi-journal-x text-3xl" aria-hidden="true"></i>
+      <span class="sr-only">Nota non trovata</span>
+    </div>
+    <h2 class="text-lg font-medium">Nota non trovata</h2>
+    <a class="notivo-btn-primary notivo-focus" (click)="showForm.emit(false)">Torna alle note</a>
+  </div>
+  } @else {
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        @if(getShareBadge(note()!); as badge) {
+        <notivo-tooltip [text]="badge.label" position="left">
+          <span
+            class="h-7 w-7 rounded-2xl border text-lg font-medium inline-flex justify-center items-center gap-1"
+            [ngClass]="badge.colorClass"
+            [attr.aria-label]="badge.label"
+          >
+            <i [class]="badge.icon" aria-hidden="true"></i>
+            <span class="sr-only">{{ badge.label }}</span>
+          </span>
+        </notivo-tooltip>
+        }
+        <h1 class="text-2xl font-semibold">{{ note()!.title }}</h1>
+      </div>
+      @if(canDelete(note()!)) {
+      <div class="flex items-center gap-2 justify-end ml-6">
+        <a class="notivo-btn-outline-primary notivo-focus" (click)="showForm.emit(true)">
+          <span>Modifica</span>
+        </a>
+        <button
+          class="notivo-btn-danger-outline notivo-focus"
+          type="button"
+          (click)="openDeleteModal()"
+        >
+          <span>Elimina</span>
+        </button>
+      </div>
+      }
+    </div>
+    <div class="flex items-center gap-2 text-sm text-dark">
+      <span>{{ note()!.updatedAt | date : 'dd MMM yyyy, HH:mm' }}</span>
+    </div>
+    <div class="flex gap-8">
+      <div class="flex flex-col">
+        <span class="text-sm font-medium">Tag</span>
+        @if(note()!.tags && note()!.tags!.length > 0) {
+        <div class="flex items-center gap-2 mt-2 flex-wrap">
+          @for(tag of note()!.tags; track tag.value) {
+          <span class="px-2 py-1 rounded-full bg-primary/10 text-primary capitalize text-xs">
+            {{ tag.label }}
+          </span>
+          }
+        </div>
+        } @else {
+        <p class="text-sm text-dark">Nessun tag</p>
+        }
+      </div>
+      <div class="flex flex-col justify-between">
+        <span class="text-sm font-medium">Condivisa con</span>
+        @if(note()!.sharedWith && note()!.sharedWith!.length > 0) {
+        <div class="flex items-center gap-2 mt-2 flex-wrap">
+          @for(sharedWith of note()!.sharedWith; track sharedWith.value) {
+          <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize text-xs">
+            {{ sharedWith.label }}
+          </span>
+          }
+        </div>
+        } @else {
+        <p class="text-sm text-dark">Non condivisa</p>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="overflow-hidden pt-10">
+    <div class="text-sm inner-a" [innerHTML]="note()!.body"></div>
+  </div>
+
+  }
+</div>
