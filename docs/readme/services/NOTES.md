@@ -118,7 +118,3 @@ curl -i -X POST http://localhost:3003/tags \
 # Lista tag
 curl -i http://localhost:3003/tags
 ```
-
-## Note operative
-- Assicurarsi che il gateway propaghi correttamente gli header utente; in locale usare le rotte via gateway (`/notes/*`).
-- Per performance, mantenere coerente la strategia di invalidazione delle cache Mongo a seguito di mutazioni (create/update/delete note, upsert tag).

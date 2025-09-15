@@ -98,10 +98,6 @@ curl -i http://localhost:3002/<USER_ID>
 curl -i 'http://localhost:3002/search/by-username?username=demo'
 ```
 
-## Note operative
-- In produzione esporre le rotte tramite gateway (`/users/*`) per garantire autenticazione e CORS corretti.
-- Mantenere coerente la cache `users_cache` quando si aggiungono utenti o cambiano visibilità/relazioni.
-
 ## Politiche di aggiornamento cache (`users_cache`)
 - Trigger consigliati:
   - Dopo `POST /users` (creazione utente): ricostruire `others` per tutti gli utenti interessati o invalidare globalmente.

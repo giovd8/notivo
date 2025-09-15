@@ -41,10 +41,4 @@ Questo documento elenca le collezioni Mongo usate come cache applicativa. Non es
 - TTL attivo in `user_search_cache` (24 ore) e in `sessions` su `expiresAt`.
 - `updatedAt`/`lastUpdated` vengono aggiornati in pre-save per mantenere freshness.
 
-## Note operative
-
-- Non esistono join/relazioni; ogni cache deriva da sorgenti autorevoli (p.es. Postgres).
-- In caso di cache miss o documento scaduto, i servizi devono ricalcolare e sostituire il contenuto.
-- Evitare aggiornamenti parziali incoerenti: preferire il ricalcolo atomico del documento di cache per l’utente/chiave interessata.
-
 

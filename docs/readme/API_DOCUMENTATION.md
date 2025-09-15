@@ -147,7 +147,3 @@ Per problemi o domande:
 - Controlla i log del gateway
 - Verifica la configurazione dei servizi
 - Consulta la documentazione OpenAPI completa
-
----
-
-**Nota**: Questa documentazione è generata automaticamente dal file `swagger.yaml` e si aggiorna in tempo reale con le modifiche al codice.
