@@ -78,6 +78,8 @@ services:
       context: ./services/auth
       dockerfile: Dockerfile.prod
     image: notivo-auth:prod
+    environment:
+      - NODE_ENV=production
     env_file: .env
     depends_on:
       - postgres
@@ -94,6 +96,8 @@ services:
       context: ./services/users
       dockerfile: Dockerfile.prod
     image: notivo-users:prod
+    environment:
+      - NODE_ENV=production
     env_file: .env
     depends_on:
       - postgres
@@ -110,6 +114,8 @@ services:
       context: ./services/notes
       dockerfile: Dockerfile.prod
     image: notivo-notes:prod
+    environment:
+      - NODE_ENV=production
     env_file: .env
     depends_on:
       - postgres
