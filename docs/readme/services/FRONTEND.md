@@ -1,3 +1,4 @@
+
 # Notivo – Frontend Angular
 
 Questo documento descrive l’architettura, la struttura dei moduli, i flussi principali e le convenzioni adottate nel progetto frontend contenuto nella cartella `frontend`. È pensato per una documentazione di analisi tecnica.
@@ -28,24 +29,25 @@ frontend/
           login/
           register/
       core/
-        components/ (es. sidenav, toast)
+        components/ (es. sidenav, toast, modal)
         interceptors/error-interceptor.ts
         models.ts
         services/toast.ts
         utils.ts
       features/
-        home/
         notes/
-          notes.routes.ts
+          notes.ts, notes.html
           create-edit-note/
           note-details/
           notes-list/
+          components/ (es. notes-legend)
         stores/
           note.ts
           common.ts
       services/
         common.ts
         note.ts
+        modal.service.ts
       shared/
         components/ (...)
         directives/
@@ -69,10 +71,10 @@ frontend/
 
 ### Routing
 
-- La rotta root `''` carica in lazy-loading la feature `notes`:
-  - `loadChildren: () => import('./features/notes/notes.routes').then((m) => m.notesRoutes)`
-  - Protetta da `authGuard` sia su `canActivate` sia su `canActivateChild`.
-- Wildcard `** → 'notes'`.
+- Rotta protetta `notes` con lazy component:
+  - `loadComponent: () => import('./features/notes/notes').then((m) => m.Notes)`
+  - Guard: `canActivate` e `canActivateChild` con `authGuard`.
+- Root `''` e wildcard `**` reindirizzano a `notes`.
 - `auth.routes.ts` espone rotte pubbliche:
   - `login`, `register`: protette da `notAuthGuard` (impedisce accesso ad utenti autenticati e consente fallback su refresh anonimo).
 
@@ -91,8 +93,7 @@ frontend/
 
 - `error-interceptor.ts` registra un `HttpInterceptorFn` globale:
   - Gestione centralizzata errori HTTP (`HttpErrorResponse`).
-  - Hook per logout su `401` (commentato al momento); integrazione prevista con `AuthStore` e `Router`.
-  - Punto di integrazione per `ToastService` (notifiche utente), attualmente disabilitato/commentato.
+  - Hook per logout su `401`; integrazione prevista con `AuthStore` e `Router`.
 
 ### Servizi di dominio (API client)
 

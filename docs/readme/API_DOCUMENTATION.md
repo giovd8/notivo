@@ -58,6 +58,7 @@ La documentazione supporta l'autenticazione tramite cookie HTTP-only:
 
 #### Autenticazione
 - `POST /auth/register` - Registrazione utente
+- `POST /auth/register/test-users` - Registrazione utenti di test (pubblico)
 - `POST /auth/login` - Login utente  
 - `POST /auth/refresh` - Rinnovo token
 - `POST /auth/logout` - Logout utente
@@ -67,10 +68,11 @@ La documentazione supporta l'autenticazione tramite cookie HTTP-only:
 - `POST /notes` - Crea nota
 - `PUT /notes/{id}` - Aggiorna nota
 - `DELETE /notes/{id}` - Elimina nota
+- `POST /notes/test-notes` - Crea note di test in massa (pubblico)
 
 #### Tag
 - `GET /notes/tags` - Lista tag
-- `POST /notes/tags` - Crea tag
+- `POST /notes/tags` - Crea tag (pubblico)
 
 #### Utenti
 - `GET /users` - Lista utenti

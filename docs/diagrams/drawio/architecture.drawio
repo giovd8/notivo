@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" version="28.2.1">
+  <diagram id="microservices-architecture" name="Microservices Architecture">
+    <mxGraphModel dx="2133" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="frontend" value="Frontend" style="shape=rectangle;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="200" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="API Gateway &#xa;(Auth Token Validation, &#xa;Routing and centralized logger)" style="shape=rectangle;fillColor=#ffe6cc;strokeColor=#d79b00;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="310" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" value="Auth Service &#xa;(Login/Register/Refresh)" style="shape=rectangle;fillColor=#d5e8d4;strokeColor=#82b366;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="-260" y="440" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="users" value="Users Service &#xa;(Manage Users)" style="shape=rectangle;fillColor=#f8cecc;strokeColor=#b85450;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="440" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="notes" value="Notes Service &#xa;(Manage Notes)" style="shape=rectangle;fillColor=#fff2cc;strokeColor=#d6b656;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="440" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" value="&#xa;Postgres DB &#xa;(Persistent Data)" style="shape=cylinder;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="240" y="580" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mongo" value="&#xa;MongoDB &#xa;(Cache)" style="shape=cylinder;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="-80" y="580" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-gateway" parent="1" source="frontend" target="gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-auth" parent="1" source="gateway" target="auth" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-users" parent="1" source="gateway" target="users" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-notes" parent="1" source="gateway" target="notes" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-postgres" parent="1" source="auth" target="postgres" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="users-postgres" parent="1" source="users" target="postgres" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="notes-postgres" parent="1" source="notes" target="postgres" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-mongo" parent="1" source="auth" target="mongo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="users-mongo" parent="1" source="users" target="mongo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="notes-mongo" parent="1" source="notes" target="mongo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YOfLMnRDZypRUeqLxR55-1" style="entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="auth" target="users">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-30" y="470" as="sourcePoint" />
+            <mxPoint x="-40" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

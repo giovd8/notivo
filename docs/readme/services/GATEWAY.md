@@ -20,7 +20,10 @@ gateway/
       limiter.ts
       logger.ts
       proxy.ts
+      environment.ts
       public-routes.ts
+      swagger.ts
+      swagger-loader.ts
     middlewares/
       auth.ts
     index.ts
@@ -29,7 +32,7 @@ gateway/
 ```
 
 ## Configurazione e variabili d’ambiente
-- Validazione tramite `zod` (`EnvSchema` in `src/index.ts`). Variabili:
+- Validazione tramite `zod` (`EnvSchema` in `src/configs/environment.ts`). Variabili:
   - `PORT` (default: 3000)
   - `NODE_ENV` (`development` | `production`, default: `development`)
   - `AUTH_SERVICE_URL` (default: `http://auth-service:3001`)
@@ -56,14 +59,15 @@ Ordinamento principale in `src/index.ts`:
 5. Probe:
    - `GET /health` → `{ message: "ok" }`
    - `GET /ready` → `{ message: "ready" }`
-6. Routing proxy:
+6. API Docs: `/api-docs` (Swagger UI), `/swagger.json` (documento JSON)
+7. Routing proxy:
    - `/auth` → `AUTH_SERVICE_URL` (pubblico)
    - `/notes` → `NOTES_SERVICE_URL` (protetto da `authMiddleware`)
    - `/users` → `USERS_SERVICE_URL` (protetto da `authMiddleware`)
-7. Parser body: `express.json`/`urlencoded` (limite 1MB).
-8. 404 handler e error handler centralizzato.
-9. Timeouts HTTP hardenizzati:
-   - `keepAliveTimeout = 65s`, `headersTimeout = 70s`, `requestTimeout = 30s`.
+8. Parser body: `express.json`/`urlencoded` (limite 1MB).
+9. 404 handler e error handler centralizzato.
+10. Timeouts HTTP hardenizzati:
+    - `keepAliveTimeout = 65s`, `headersTimeout = 70s`, `requestTimeout = 30s`.
 
 ## Proxy: opzioni comuni
 - `configs/proxy.ts` esporta `commonProxyOptions`:
@@ -79,11 +83,12 @@ Ordinamento principale in `src/index.ts`:
   - Popola `req.user`, `req.headers.authorization` e header ausiliari (`x-user-id`, `x-username`).
   - In caso di token mancante/invalidato → `401`.
 
-Rotte attualmente pubbliche:
+Rotte attualmente pubbliche (prefisso completo, match per `startsWith`):
 ```
 /public-routes.ts
 - POST /notes/tags
 - POST /auth/register/test-users
+- POST /notes/test-notes
 ```
 
 ## CORS

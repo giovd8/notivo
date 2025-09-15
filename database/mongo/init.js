@@ -1,7 +1,7 @@
 db = db.getSiblingDB("notivo");
 
 db.createCollection("sessions");
-// db.sessions.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+db.sessions.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 // db.sessions.insertOne({
 //   _id: "session-1",
 //   userId: "test-1",
@@ -16,8 +16,8 @@ db.createCollection("sessions");
 
 
 db.createCollection("users_cache");
-// db.users_cache.createIndex({ userId: 1 }, { unique: true });
-// db.users_cache.createIndex({ updatedAt: 1 });
+db.users_cache.createIndex({ userId: 1 }, { unique: true });
+db.users_cache.createIndex({ updatedAt: 1 });
 // db.users_cache.insertMany([
 //   { userId: "test-1", others: [
 //     { id: "test-2", username: "user2", createdAt: new Date() },
@@ -33,24 +33,10 @@ db.createCollection("users_cache");
 //   ], updatedAt: new Date() },
 // ]);
 
-// Legacy: user notes cache no longer used
-// db.createCollection("user_notes_cache");
-// db.user_notes_cache.createIndex({ userId: 1 }, { unique: true });
-// db.user_notes_cache.createIndex({ updatedAt: 1 });
-// db.user_notes_cache.insertMany([
-//   { userId: "test-1", notes: [
-//     { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
-//   ], updatedAt: new Date() },
-//   { userId: "test-2", notes: [
-//     { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
-//   ], updatedAt: new Date() },
-//   { userId: "test-3", notes: [
-//     { id: "note-1", title: "Nota di test", body: "Contenuto della prima nota di test", ownerId: "test-1", createdAt: new Date(), updatedAt: new Date() }
-//   ], updatedAt: new Date() },
-// ]);
+
 
 db.createCollection("tags_cache");
-// db.tags_cache.createIndex({ key: 1 }, { unique: true });
+db.tags_cache.createIndex({ key: 1 }, { unique: true });
 // db.tags_cache.createIndex({ updatedAt: 1 });
 // db.tags_cache.insertOne({
 //   key: "global",
@@ -71,6 +57,6 @@ db.user_search_cache.createIndex({ lastUpdated: 1 }, { expireAfterSeconds: 86400
 //   userId: "123",
 //   key: "progetto|lavoro",
 //   filter: { text: "progetto", tags: ["lavoro"] },
-//   results: [],
+//   results: [], // array of note
 //   lastUpdated: new Date(),
 // });
