@@ -28,8 +28,12 @@ export const createApp = () => {
 const start = async () => {
   await Promise.all([initPostgres(), initMongo()]);
   const app = createApp();
-  const port = Number(process.env.PORT || 3000);
+  const port = Number(process.env.PORT || 3003);
   const server = http.createServer(app);
+
+  app.get('/health', (_req: Request, res: Response) => {
+    res.status(200).json({ message: 'ok' });
+  });
 
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}. Shutting down...`);

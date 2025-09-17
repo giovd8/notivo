@@ -29,6 +29,10 @@ const start = async () => {
   const port = Number(process.env.PORT || 3002);
   const server = http.createServer(app);
 
+  app.get('/health', (_req: Request, res: Response) => {
+    res.status(200).json({ message: 'ok' });
+  });
+
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}. Shutting down...`);
     server.close(async () => {
