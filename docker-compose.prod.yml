@@ -9,7 +9,7 @@ services:
     environment:
       CERTBOT_EMAIL: "giovanni_vidotto@hotmail.it"
       CERTBOT_DOMAINS: "notivo.giovannividotto.it"
-      CERTBOT_STAGING: "1"
+      CERTBOT_STAGING: "0"
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/user.conf.d/nginx.conf:ro
       - nginx_secrets:/var/lib/letsencrypt

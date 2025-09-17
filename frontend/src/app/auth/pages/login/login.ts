@@ -8,6 +8,8 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import { ToastType } from '../../../core/models';
+import { ToastService } from '../../../core/services/toast';
 import { UserCredential } from '../../../shared/models/user';
 import { AuthStore } from '../../auth.store';
 import { Header } from '../../shared/components/header/header';
@@ -24,7 +26,9 @@ export class Login {
   readonly store = inject(AuthStore);
   readonly submitting = signal(false);
   readonly passwordVisible = signal(false);
+  readonly toast = inject(ToastService);
   isError = signal(false);
+  isInvalidCredential = signal(false);
 
   readonly form = new FormGroup({
     username: new FormControl<string>('', {
@@ -51,10 +55,21 @@ export class Login {
       .subscribe({
         next: () => {
           this.router.navigate(['/']);
+          this.toast.show({
+            message: `Benvenuto ${this.form.value.username}`,
+            type: ToastType.Success,
+            seconds: 5,
+          });
         },
-        error: () => {
+        error: (err) => {
           this.submitting.set(false);
+          if (err.status === 401) {
+            this.isInvalidCredential.set(true);
+            this.isError.set(false);
+            return;
+          }
           this.isError.set(true);
+          this.isInvalidCredential.set(false);
         },
       });
   }
