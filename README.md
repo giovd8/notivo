@@ -94,10 +94,10 @@ Sono state adottate ulteriori misure di sicurezza, tra cui:
 ### Installazione
 ```bash
 # Clona il repository
-git clone <repository-url>
+git clone https://github.com/giovd8/notivo.git
 cd notivo
 
-# Installa dipendenze
+# Installa dipendenze per ogni servizio con
 npm install
 
 # Avvia tutti i servizi
@@ -137,11 +137,6 @@ Per maggiori dettagli consultare i file markdown contenuti in `/docs/readme`:
 - **Docker**: Configurazione e setup dell'ambiente containerizzato
 - **Quick Start**: Guida rapida per l'avvio del progetto
 
-## Licenza
-
-MIT License - vedi [LICENSE](LICENSE) per dettagli.
-
----
 
 **Sviluppato da**: Giovanni Vidotto  
 **Email**: giovanni.vidotto@hotmail.it  
