@@ -10,6 +10,8 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import { ToastType } from '../../../core/models';
+import { ToastService } from '../../../core/services/toast';
 import { UserCredential } from '../../../shared/models/user';
 import { AuthService } from '../../services/auth';
 import { Header } from '../../shared/components/header/header';
@@ -36,7 +38,7 @@ function passwordsMatchValidator(): ValidatorFn {
 export class Register {
   readonly auth = inject(AuthService);
   readonly router = inject(Router);
-
+  readonly toast = inject(ToastService);
   readonly submitting = signal(false);
   readonly passwordVisible = signal(false);
   readonly confirmPasswordVisible = signal(false);
@@ -76,6 +78,11 @@ export class Register {
       .subscribe({
         next: () => {
           this.router.navigate(['/']);
+          this.toast.show({
+            message: `Benvenuto ${this.form.value.username}`,
+            type: ToastType.Success,
+            seconds: 5,
+          });
         },
         error: (err) => {
           this.submitting.set(false);
